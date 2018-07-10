@@ -12,7 +12,6 @@
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "SidekickForce.hpp"
 #include "ConstantTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"

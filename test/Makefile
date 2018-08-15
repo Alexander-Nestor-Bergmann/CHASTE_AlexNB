@@ -78,27 +78,16 @@ package/fast: package
 
 .PHONY : package/fast
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
+	cd /home/chaste && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/chaste/CPackSourceConfig.cmake
+.PHONY : package_source
 
-# Special rule for the target install/local
-install/local/fast: install/local
+# Special rule for the target package_source
+package_source/fast: package_source
 
-.PHONY : install/local/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
+.PHONY : package_source/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -110,6 +99,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # Special rule for the target install
 install: preinstall
@@ -123,6 +123,16 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Config\" \"CxxTest\" \"Python\" \"cell_based_headers\" \"cell_based_libraries\" \"continuum_mechanics_headers\" \"continuum_mechanics_libraries\" \"crypt_headers\" \"crypt_libraries\" \"global_headers\" \"global_libraries\" \"heart_headers\" \"heart_libraries\" \"io_headers\" \"io_libraries\" \"linalg_headers\" \"linalg_libraries\" \"lung_headers\" \"lung_libraries\" \"mesh_headers\" \"mesh_libraries\" \"ode_headers\" \"ode_libraries\" \"pde_headers\" \"pde_libraries\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
@@ -134,26 +144,16 @@ install/strip/fast: install/strip
 
 .PHONY : install/strip/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Config\" \"CxxTest\" \"Python\" \"cell_based_headers\" \"cell_based_libraries\" \"continuum_mechanics_headers\" \"continuum_mechanics_libraries\" \"crypt_headers\" \"crypt_libraries\" \"global_headers\" \"global_libraries\" \"heart_headers\" \"heart_libraries\" \"io_headers\" \"io_libraries\" \"linalg_headers\" \"linalg_libraries\" \"lung_headers\" \"lung_libraries\" \"mesh_headers\" \"mesh_libraries\" \"ode_headers\" \"ode_libraries\" \"pde_headers\" \"pde_libraries\""
-.PHONY : list_install_components
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
 
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
+# Special rule for the target install/local
+install/local/fast: install/local
 
-.PHONY : list_install_components/fast
-
-# Special rule for the target package_source
-package_source:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	cd /home/chaste && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/chaste/CPackSourceConfig.cmake
-.PHONY : package_source
-
-# Special rule for the target package_source
-package_source/fast: package_source
-
-.PHONY : package_source/fast
+.PHONY : install/local/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -188,19 +188,34 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule:
-	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
-.PHONY : projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
+projects/AlexNB/test/CMakeFiles/TestScenario2.dir/rule:
+	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestScenario2.dir/rule
+.PHONY : projects/AlexNB/test/CMakeFiles/TestScenario2.dir/rule
 
 # Convenience name for target.
-TestSdkSimulations: projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
+TestScenario2: projects/AlexNB/test/CMakeFiles/TestScenario2.dir/rule
 
-.PHONY : TestSdkSimulations
+.PHONY : TestScenario2
 
 # fast build rule for target.
-TestSdkSimulations/fast:
-	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/build
-.PHONY : TestSdkSimulations/fast
+TestScenario2/fast:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario2.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario2.dir/build
+.PHONY : TestScenario2/fast
+
+# Convenience name for target.
+projects/AlexNB/test/CMakeFiles/TestScenario1.dir/rule:
+	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestScenario1.dir/rule
+.PHONY : projects/AlexNB/test/CMakeFiles/TestScenario1.dir/rule
+
+# Convenience name for target.
+TestScenario1: projects/AlexNB/test/CMakeFiles/TestScenario1.dir/rule
+
+.PHONY : TestScenario1
+
+# fast build rule for target.
+TestScenario1/fast:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario1.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario1.dir/build
+.PHONY : TestScenario1/fast
 
 # Convenience name for target.
 projects/AlexNB/test/CMakeFiles/TestHello.dir/rule:
@@ -218,19 +233,49 @@ TestHello/fast:
 .PHONY : TestHello/fast
 
 # Convenience name for target.
-projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/rule:
-	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/rule
-.PHONY : projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/rule
+projects/AlexNB/test/CMakeFiles/TestScenario3.dir/rule:
+	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestScenario3.dir/rule
+.PHONY : projects/AlexNB/test/CMakeFiles/TestScenario3.dir/rule
 
 # Convenience name for target.
-TestSdkSimulations_NB: projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/rule
+TestScenario3: projects/AlexNB/test/CMakeFiles/TestScenario3.dir/rule
 
-.PHONY : TestSdkSimulations_NB
+.PHONY : TestScenario3
 
 # fast build rule for target.
-TestSdkSimulations_NB/fast:
-	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/build
-.PHONY : TestSdkSimulations_NB/fast
+TestScenario3/fast:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario3.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario3.dir/build
+.PHONY : TestScenario3/fast
+
+# Convenience name for target.
+projects/AlexNB/test/CMakeFiles/TestScenario4.dir/rule:
+	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestScenario4.dir/rule
+.PHONY : projects/AlexNB/test/CMakeFiles/TestScenario4.dir/rule
+
+# Convenience name for target.
+TestScenario4: projects/AlexNB/test/CMakeFiles/TestScenario4.dir/rule
+
+.PHONY : TestScenario4
+
+# fast build rule for target.
+TestScenario4/fast:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario4.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario4.dir/build
+.PHONY : TestScenario4/fast
+
+# Convenience name for target.
+projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule:
+	cd /home/chaste && $(MAKE) -f CMakeFiles/Makefile2 projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
+.PHONY : projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
+
+# Convenience name for target.
+TestSdkSimulations: projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/rule
+
+.PHONY : TestSdkSimulations
+
+# fast build rule for target.
+TestSdkSimulations/fast:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/build
+.PHONY : TestSdkSimulations/fast
 
 TestHello.o: TestHello.cpp.o
 
@@ -259,6 +304,114 @@ TestHello.cpp.s:
 	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestHello.dir/build.make projects/AlexNB/test/CMakeFiles/TestHello.dir/TestHello.cpp.s
 .PHONY : TestHello.cpp.s
 
+TestScenario1.o: TestScenario1.cpp.o
+
+.PHONY : TestScenario1.o
+
+# target to build an object file
+TestScenario1.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario1.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario1.dir/TestScenario1.cpp.o
+.PHONY : TestScenario1.cpp.o
+
+TestScenario1.i: TestScenario1.cpp.i
+
+.PHONY : TestScenario1.i
+
+# target to preprocess a source file
+TestScenario1.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario1.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario1.dir/TestScenario1.cpp.i
+.PHONY : TestScenario1.cpp.i
+
+TestScenario1.s: TestScenario1.cpp.s
+
+.PHONY : TestScenario1.s
+
+# target to generate assembly for a file
+TestScenario1.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario1.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario1.dir/TestScenario1.cpp.s
+.PHONY : TestScenario1.cpp.s
+
+TestScenario2.o: TestScenario2.cpp.o
+
+.PHONY : TestScenario2.o
+
+# target to build an object file
+TestScenario2.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario2.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario2.dir/TestScenario2.cpp.o
+.PHONY : TestScenario2.cpp.o
+
+TestScenario2.i: TestScenario2.cpp.i
+
+.PHONY : TestScenario2.i
+
+# target to preprocess a source file
+TestScenario2.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario2.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario2.dir/TestScenario2.cpp.i
+.PHONY : TestScenario2.cpp.i
+
+TestScenario2.s: TestScenario2.cpp.s
+
+.PHONY : TestScenario2.s
+
+# target to generate assembly for a file
+TestScenario2.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario2.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario2.dir/TestScenario2.cpp.s
+.PHONY : TestScenario2.cpp.s
+
+TestScenario3.o: TestScenario3.cpp.o
+
+.PHONY : TestScenario3.o
+
+# target to build an object file
+TestScenario3.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario3.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario3.dir/TestScenario3.cpp.o
+.PHONY : TestScenario3.cpp.o
+
+TestScenario3.i: TestScenario3.cpp.i
+
+.PHONY : TestScenario3.i
+
+# target to preprocess a source file
+TestScenario3.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario3.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario3.dir/TestScenario3.cpp.i
+.PHONY : TestScenario3.cpp.i
+
+TestScenario3.s: TestScenario3.cpp.s
+
+.PHONY : TestScenario3.s
+
+# target to generate assembly for a file
+TestScenario3.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario3.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario3.dir/TestScenario3.cpp.s
+.PHONY : TestScenario3.cpp.s
+
+TestScenario4.o: TestScenario4.cpp.o
+
+.PHONY : TestScenario4.o
+
+# target to build an object file
+TestScenario4.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario4.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario4.dir/TestScenario4.cpp.o
+.PHONY : TestScenario4.cpp.o
+
+TestScenario4.i: TestScenario4.cpp.i
+
+.PHONY : TestScenario4.i
+
+# target to preprocess a source file
+TestScenario4.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario4.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario4.dir/TestScenario4.cpp.i
+.PHONY : TestScenario4.cpp.i
+
+TestScenario4.s: TestScenario4.cpp.s
+
+.PHONY : TestScenario4.s
+
+# target to generate assembly for a file
+TestScenario4.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestScenario4.dir/build.make projects/AlexNB/test/CMakeFiles/TestScenario4.dir/TestScenario4.cpp.s
+.PHONY : TestScenario4.cpp.s
+
 TestSdkSimulations.o: TestSdkSimulations.cpp.o
 
 .PHONY : TestSdkSimulations.o
@@ -286,33 +439,6 @@ TestSdkSimulations.cpp.s:
 	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations.dir/TestSdkSimulations.cpp.s
 .PHONY : TestSdkSimulations.cpp.s
 
-TestSdkSimulations_NB.o: TestSdkSimulations_NB.cpp.o
-
-.PHONY : TestSdkSimulations_NB.o
-
-# target to build an object file
-TestSdkSimulations_NB.cpp.o:
-	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/TestSdkSimulations_NB.cpp.o
-.PHONY : TestSdkSimulations_NB.cpp.o
-
-TestSdkSimulations_NB.i: TestSdkSimulations_NB.cpp.i
-
-.PHONY : TestSdkSimulations_NB.i
-
-# target to preprocess a source file
-TestSdkSimulations_NB.cpp.i:
-	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/TestSdkSimulations_NB.cpp.i
-.PHONY : TestSdkSimulations_NB.cpp.i
-
-TestSdkSimulations_NB.s: TestSdkSimulations_NB.cpp.s
-
-.PHONY : TestSdkSimulations_NB.s
-
-# target to generate assembly for a file
-TestSdkSimulations_NB.cpp.s:
-	cd /home/chaste && $(MAKE) -f projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/build.make projects/AlexNB/test/CMakeFiles/TestSdkSimulations_NB.dir/TestSdkSimulations_NB.cpp.s
-.PHONY : TestSdkSimulations_NB.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -321,25 +447,37 @@ help:
 	@echo "... depend"
 	@echo "... test"
 	@echo "... package"
-	@echo "... install/local"
-	@echo "... TestSdkSimulations"
+	@echo "... package_source"
+	@echo "... rebuild_cache"
+	@echo "... TestScenario2"
+	@echo "... TestScenario1"
 	@echo "... edit_cache"
 	@echo "... TestHello"
-	@echo "... rebuild_cache"
+	@echo "... TestScenario3"
+	@echo "... TestScenario4"
 	@echo "... install"
-	@echo "... TestSdkSimulations_NB"
-	@echo "... install/strip"
 	@echo "... list_install_components"
-	@echo "... package_source"
+	@echo "... install/strip"
+	@echo "... TestSdkSimulations"
+	@echo "... install/local"
 	@echo "... TestHello.o"
 	@echo "... TestHello.i"
 	@echo "... TestHello.s"
+	@echo "... TestScenario1.o"
+	@echo "... TestScenario1.i"
+	@echo "... TestScenario1.s"
+	@echo "... TestScenario2.o"
+	@echo "... TestScenario2.i"
+	@echo "... TestScenario2.s"
+	@echo "... TestScenario3.o"
+	@echo "... TestScenario3.i"
+	@echo "... TestScenario3.s"
+	@echo "... TestScenario4.o"
+	@echo "... TestScenario4.i"
+	@echo "... TestScenario4.s"
 	@echo "... TestSdkSimulations.o"
 	@echo "... TestSdkSimulations.i"
 	@echo "... TestSdkSimulations.s"
-	@echo "... TestSdkSimulations_NB.o"
-	@echo "... TestSdkSimulations_NB.i"
-	@echo "... TestSdkSimulations_NB.s"
 .PHONY : help
 
 

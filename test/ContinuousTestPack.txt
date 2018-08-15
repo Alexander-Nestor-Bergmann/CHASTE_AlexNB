@@ -1,3 +1,6 @@
 TestHello.hpp
 TestSdkSimulations.hpp
-TestSdkSimulations_NB.hpp
+TestScenario1.hpp
+TestScenario2.hpp
+TestScenario3.hpp
+TestScenario4.hpp

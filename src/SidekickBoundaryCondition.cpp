@@ -31,11 +31,11 @@ void SidekickBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node
                 p_node->rGetModifiableLocation()[0] = old_node_location[0];
             }
 
-//            // If the node lies on the right, then revert its x coordinate
-//            if (p_node->rGetLocation()[0] > x_max - epsilon)
-//            {
-//                p_node->rGetModifiableLocation()[0] = old_node_location[0];
-//            }
+           // If the node lies on the right, then revert its x coordinate
+           if (p_node->rGetLocation()[0] > x_max - epsilon)
+           {
+               p_node->rGetModifiableLocation()[0] = old_node_location[0];
+           }
         }
     }}
 

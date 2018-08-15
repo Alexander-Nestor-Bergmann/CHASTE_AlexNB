@@ -55,7 +55,32 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         {
             Node<DIM>* tempNode = rCellPopulation.GetNode(node_index);
 
-            if (tempNode->IsBoundaryNode())
+            std::set<unsigned> neighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(node_index);
+
+            bool isBoundaryNode = false;
+            int numNeighbours = neighbourNodes.size();
+            if( numNeighbours < 3 )
+            {
+                isBoundaryNode = true;
+            }
+            else
+            {
+                // for (int idx=0; idx<numNeighbours; idx++)
+                for(auto tempNeighbour : neighbourNodes)
+                {
+                    // Node<DIM>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
+                    std::set<unsigned> tempNeighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(tempNeighbour);
+
+                    if (tempNeighbourNodes.size() < 3)
+                    {
+                        isBoundaryNode = true;
+                    }
+                }
+            }
+
+            // if (tempNode->IsBoundaryNode()) // GetNeighbouringElementIndices
+            // // GetNeighbouringNodeIndices
+            if (isBoundaryNode)
             {
                 centroidX += tempNode->rGetLocation()[0];
                 centroidY += tempNode->rGetLocation()[1];
@@ -73,8 +98,32 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
             // Get the node at this index
             Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
 
-            // If the node is a boundary node, order and store it.
-            if (p_node->IsBoundaryNode())
+            std::set<unsigned> neighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(node_index);
+
+            bool isBoundaryNode = false;
+            int numNeighbours = neighbourNodes.size();
+            if( numNeighbours < 3 )
+            {
+                isBoundaryNode = true;
+            }
+            else
+            {
+                // for (int idx=0; idx<numNeighbours; idx++)
+                for(auto tempNeighbour : neighbourNodes)
+                {
+                    // Node<DIM>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
+                    std::set<unsigned> tempNeighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(tempNeighbour);
+
+                    if (tempNeighbourNodes.size() < 3)
+                    {
+                        isBoundaryNode = true;
+                    }
+                }
+            }
+
+            // if (tempNode->IsBoundaryNode()) // GetNeighbouringElementIndices
+            // // GetNeighbouringNodeIndices
+            if (isBoundaryNode)
             {
                 // Get the X and Y coords
                 double currentX = p_node->rGetLocation()[0];
@@ -180,20 +229,40 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
             }
         }
 
+        std::cout << "\n" << '\n';
+        std::cout << "Boundary\n" << '\n';
+        for (unsigned i=0; i < boundaryNodes.size(); i++)
+        {
+            Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+            cout << tempNode->rGetLocation()[0] << ", ";
+        }
+        std::cout << "\n" << '\n';
+        for (unsigned i=0; i < boundaryNodes.size(); i++)
+        {
+            Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+            cout << tempNode->rGetLocation()[1] << ", ";
+        }
+        std::cout << "\n" << '\n';
+        std::cout << "PULL\n" << '\n';
+
         // Iterate over the rightmost nodes and pull them.
-        for (int i=0; i < boundaryNodes.size(); i++)
+        for (unsigned i=0; i < boundaryNodes.size(); i++)
         {
             // If it lies between the top and bottom:
             if( i >= lowerNode && i <= upperNode)
             {
                 Node<DIM>* p_node = rCellPopulation.GetNode(boundaryNodes[i]);
                 p_node->rGetModifiableLocation()[0] += mSpeed*dt;
+
+                cout << p_node->rGetLocation()[0] << ", " << p_node->rGetLocation()[1] << ", ";
+
             }
             else if( i > upperNode)
             {
                 break;
             }
         }
+        // std::cout << "\n" << '\n';
 
 
         // // Pull on the right-most nodes only, with a constant speed

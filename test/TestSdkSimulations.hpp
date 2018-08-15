@@ -22,7 +22,7 @@
 
 static const double M_DT = 0.01;
 static const double M_RELAXATION_TIME = 200;
-static const double M_EXTENSION_TIME = 300;
+static const double M_EXTENSION_TIME = 2400;
 static const double M_VIS_TIME_STEP = 1;
 static const unsigned M_NUM_CELLS_WIDE = 14;
 static const unsigned M_NUM_CELLS_HIGH = 20;
@@ -85,12 +85,12 @@ public:
         p_force->SetNumStripes(4);
         p_force->SetAreaElasticityParameter(k);
         p_force->SetPerimeterContractilityParameter(gamma_bar*k);
-        p_force->SetHomotypicLineTensionParameter(lambda_bar*pow(k,1.5));
-        p_force->SetHeterotypicLineTensionParameter(heterotypic_line_tension_multiplier*lambda_bar*pow(k,1.5));
-        p_force->SetSupercontractileLineTensionParameter(supercontractile_line_tension_multiplier*lambda_bar*pow(k,1.5));
+        p_force->SetHomotypicLineTensionParameter(lambda_bar);
+        p_force->SetHeterotypicLineTensionParameter(lambda_bar);
+        p_force->SetSupercontractileLineTensionParameter(lambda_bar);
         p_force->SetBoundaryLineTensionParameter(lambda_bar*lambda_bar*pow(k,1.5));
 
-        simulation.AddForce(p_force);
+        simulation.AddForce(p_force); // Can also add this after initial solve.
 
         // Pass in a target area modifier (needed, but not used)
         MAKE_PTR(ConstantTargetAreaModifier<2>, p_growth_modifier);
@@ -137,6 +137,10 @@ public:
                 else                                   { p_cell->GetCellData()->SetItem("stripe", 4); }
             }
         }
+        p_force->SetHomotypicLineTensionParameter(lambda_bar*pow(k,1.5));
+        p_force->SetHeterotypicLineTensionParameter(heterotypic_line_tension_multiplier*lambda_bar*pow(k,1.5));
+        p_force->SetSupercontractileLineTensionParameter(supercontractile_line_tension_multiplier*lambda_bar*pow(k,1.5));
+        p_force->SetBoundaryLineTensionParameter(lambda_bar*lambda_bar*pow(k,1.5));
 
         p_force->SetUseCombinedInterfacesForLineTension(true);
         p_force->SetUseDistinctStripeMismatchesForCombinedInterfaces(true);
@@ -147,8 +151,8 @@ public:
 
         ///\todo work out whether we need to impose the sliding BC here too (!)
         MAKE_PTR(ExtrinsicPullModifier<2>, p_modifier);
-        p_modifier->ApplyExtrinsicPullToAllNodes(true);
-        p_modifier->SetSpeed(0.1);
+        p_modifier->ApplyExtrinsicPullToAllNodes(false);
+        p_modifier->SetSpeed(0.005);
         simulation.AddSimulationModifier(p_modifier);
 
         simulation.Solve();

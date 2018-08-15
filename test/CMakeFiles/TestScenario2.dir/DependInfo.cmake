@@ -4,15 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/chaste/src/projects/AlexNB/src/ConstantTargetAreaModifier.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ConstantTargetAreaModifier.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/ExtrinsicPullModifier.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ExtrinsicPullModifier.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/ForceForScenario1.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ForceForScenario1.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/ForceForScenario2.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ForceForScenario2.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/ForceForScenario3.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ForceForScenario3.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/ForceForScenario4.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/ForceForScenario4.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/Hello.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/Hello.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/RandomForce.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/RandomForce.cpp.o"
-  "/home/chaste/src/projects/AlexNB/src/SidekickBoundaryCondition.cpp" "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/SidekickBoundaryCondition.cpp.o"
+  "/home/chaste/projects/AlexNB/test/TestScenario2.cpp" "/home/chaste/projects/AlexNB/test/CMakeFiles/TestScenario2.dir/TestScenario2.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -97,10 +89,13 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "src/global/src/checkpointing"
   "src/global/src/timing"
   "src/global/src/fortests"
+  "src/projects/AlexNB/test"
+  "cxxtest"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/home/chaste/projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/DependInfo.cmake"
   "/home/chaste/cell_based/CMakeFiles/chaste_cell_based.dir/DependInfo.cmake"
   "/home/chaste/pde/CMakeFiles/chaste_pde.dir/DependInfo.cmake"
   "/home/chaste/ode/CMakeFiles/chaste_ode.dir/DependInfo.cmake"

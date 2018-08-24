@@ -20,12 +20,11 @@
 #include "ForceForScenario4.hpp"
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 #include "ToroidalHoneycombVertexMeshGeneratorMutable.hpp"
-#include "StressTensor.hpp"
 
 static const double M_DT = 0.1;
 static const double M_RELAXATION_TIME = 9;
 static const double M_EXTENSION_TIME = 300;
-static const double M_VIS_TIME_STEP = 1;
+static const double M_VIS_TIME_STEP = 10;
 static const unsigned M_NUM_CELLS_WIDE = 12;
 static const unsigned M_NUM_CELLS_HIGH = 20;
 
@@ -37,9 +36,9 @@ public:
     {
         // Specify simulation rules
         bool check_internal_intersections = false;
-        bool use_combined_interfaces_for_line_tension = true;
+        bool use_combined_interfaces_for_line_tension = false;
         bool use_distinct_stripe_mismatches_for_combined_interfaces = false;
-        std::string output_name("TestToroidalConstPull_myparams_Scenario3");
+        std::string output_name("TestToroidalConstPull_Scenario2");
 
         // Specify mechanical parameter values
         // -0.259,0.172

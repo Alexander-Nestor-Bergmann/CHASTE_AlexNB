@@ -23,13 +23,14 @@
 #include "SidekickBoundaryCondition.hpp"
 #include "ForceForScenario4.hpp"
 #include "StressTensor.hpp"
+#include <Eigen/Dense>
 
 
 static const double M_DT = 0.1;
-static const double M_RELAXATION_TIME = 10;
+static const double M_RELAXATION_TIME = 20;
 static const double M_VIS_TIME_STEP = 1;
-static const unsigned M_NUM_CELLS_WIDE = 4;
-static const unsigned M_NUM_CELLS_HIGH = 4;
+static const unsigned M_NUM_CELLS_WIDE = 40;
+static const unsigned M_NUM_CELLS_HIGH = 40;
 static const double M_PULL = 0.05;
 
 class TestStressTensor : public AbstractCellBasedWithTimingsTestSuite
@@ -90,11 +91,28 @@ public:
 
         // StressTensor
         c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population);
-        // Need to make a 3x3
-        // c_matrix<double, 2,2>
+        // Convert to Eigen::Matrix type
+        Eigen::Matrix2d eigenStressTensor(2,2);
+        // Assign values
+        // eigenStressTensor << 1, 2, 3, 4;
+        eigenStressTensor(0,0) = stressTensor2d(0,0);
+        eigenStressTensor(0,1) = stressTensor2d(0,1);
+        eigenStressTensor(1,0) = stressTensor2d(1,0);
+        eigenStressTensor(1,1) = stressTensor2d(1,1);
+        // Output the tensor.
+        std::cout << eigenStressTensor << '\n';
+        // Create the solver
+        Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(eigenStressTensor);
+        // Check for success.
+        if (eigensolver.info() != Eigen::Success) abort();
+        // Output results
+        cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
+       cout << "Here's a matrix whose columns are eigenvectors of A \n"
+            << "corresponding to these eigenvalues:\n"
+            << eigensolver.eigenvectors() << endl;
 
 
-        cout << stressTensor(0,0) << ", " << stressTensor(0,1) << ", " << stressTensor(1,0) << ", " << stressTensor(1,1) << ", ";
+        cout << stressTensor2d(0,0) << ", " << stressTensor2d(0,1) << ", " << stressTensor2d(1,0) << ", " << stressTensor2d(1,1) << ", ";
         std::cerr << "/* error message */" << '\n';
 
 

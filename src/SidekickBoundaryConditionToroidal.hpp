@@ -7,7 +7,6 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-
 class SidekickBoundaryConditionToroidal : public AbstractCellPopulationBoundaryCondition<2>
 {
 private:

@@ -1,6 +1,5 @@
 #include "ExtrinsicPullModifier.hpp"
 
-
 ExtrinsicPullModifier::ExtrinsicPullModifier()
     : AbstractCellBasedSimulationModifier<2>(),
       mApplyExtrinsicPullToAllNodes(true),
@@ -8,11 +7,9 @@ ExtrinsicPullModifier::ExtrinsicPullModifier()
 {
 }
 
-
 ExtrinsicPullModifier::~ExtrinsicPullModifier()
 {
 }
-
 
 void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& rCellPopulation)
 {
@@ -281,24 +278,19 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
     }
 }
 
-
-
 void ExtrinsicPullModifier::SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)
 {
 }
-
 
 void ExtrinsicPullModifier::ApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes)
 {
     mApplyExtrinsicPullToAllNodes = applyExtrinsicPullToAllNodes;
 }
 
-
 void ExtrinsicPullModifier::SetSpeed(double speed)
 {
     mSpeed = speed;
 }
-
 
 void ExtrinsicPullModifier::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
@@ -308,10 +300,6 @@ void ExtrinsicPullModifier::OutputSimulationModifierParameters(out_stream& rPara
     // Next, call method on direct parent class
     AbstractCellBasedSimulationModifier<2>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-class ExtrinsicPullModifier;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

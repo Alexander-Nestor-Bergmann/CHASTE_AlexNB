@@ -10,7 +10,6 @@
 // {
 // }
 
-
 c_matrix<double, 2,2> GetSingleCellStressTensor(AbstractCellPopulation<2,2>& rCellPopulation, unsigned elementIndex)
 {
     AbstractMesh<2, 2>& r_mesh = rCellPopulation.rGetMesh();
@@ -53,44 +52,37 @@ c_matrix<double, 2,2> GetSingleCellStressTensor(AbstractCellPopulation<2,2>& rCe
     return stressTensor;
 }
 
-
 c_matrix<double, 2, 2> GetTissueStressTensor(AbstractCellPopulation<2,2>& rCellPopulation)
 {
     AbstractMesh<2, 2>& r_mesh = rCellPopulation.rGetMesh();
+
     // Pointer to mesh
     MutableVertexMesh<2,2>* p_mesh = static_cast<MutableVertexMesh<2,2>*>(&r_mesh);
 
     // Initialise stress tensor
-    c_matrix<double, 2,2> tissueStressTensor;
-    tissueStressTensor(0,0) = 0;
-    tissueStressTensor(0,1) = 0;
-    tissueStressTensor(1,0) = 0;
-    tissueStressTensor(1,1) = 0;
+    c_matrix<double, 2,2> tissue_stress_tensor = zero_matrix<double>(2,2);
 
     // Get num cells
     unsigned num_cells = p_mesh->GetNumElements();
-    // Iterate over cells and add individual tensors.
-    c_matrix<double, 2,2> cellStressTensor ;
-    double totalArea = 0;
-    double cellArea;
+
+    // Iterate over cells and add individual tensors
+    c_matrix<double, 2,2> cell_stress_tensor;
+    double total_area = 0.0;
     for (unsigned elem_idx = 0 ; elem_idx < num_cells ; elem_idx++)
     {
         // Get area
-        cellArea = p_mesh->GetSurfaceAreaOfElement(elem_idx);
-        totalArea += cellArea;
+        double cell_area = p_mesh->GetSurfaceAreaOfElement(elem_idx);
+        total_area += cell_area;
+
         // Add stress tensors
-        cellStressTensor = GetSingleCellStressTensor(rCellPopulation, elem_idx);
-        tissueStressTensor += cellStressTensor*cellArea;
+        cell_stress_tensor = GetSingleCellStressTensor(rCellPopulation, elem_idx);
+        tissue_stress_tensor += cell_stress_tensor*cell_area;
     }
 
-    tissueStressTensor /= totalArea;
+    tissue_stress_tensor /= total_area;
 
-    return tissueStressTensor;
+    return tissue_stress_tensor;
 }
-
-// // Explicit instantiation
-// class StressTensor;
-
 
 // Serialization for Boost >= 1.36
 // #include "SerializationExportWrapperForCpp.hpp"

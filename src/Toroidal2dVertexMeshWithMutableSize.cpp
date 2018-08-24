@@ -1,38 +1,3 @@
-/*
-
-Copyright (c) 2005-2017, University of Oxford.
-All rights reserved.
-
-University of Oxford means the Chancellor, Masters and Scholars of the
-University of Oxford, having an administrative office at Wellington
-Square, Oxford OX1 2JD, UK.
-
-This file is part of Chaste.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
- * Neither the name of the University of Oxford nor the names of its
-   contributors may be used to endorse or promote products derived from this
-   software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
-
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 
 Toroidal2dVertexMeshWithMutableSize::Toroidal2dVertexMeshWithMutableSize
@@ -44,7 +9,12 @@ Toroidal2dVertexMeshWithMutableSize::Toroidal2dVertexMeshWithMutableSize
                                            double t2Threshold)
     : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
       mWidth(width),
-      mHeight(height)
+      mHeight(height),
+      mBoxLowerY(0.0),
+      mBoxUpperY(height),
+      mBoxLowerX(0.0),
+      mBoxUpperX(width),
+      mpMeshForVtk(nullptr)
 {
     // Call ReMesh() to remove any deleted nodes and relabel
     ReMesh();
@@ -56,6 +26,7 @@ Toroidal2dVertexMeshWithMutableSize::Toroidal2dVertexMeshWithMutableSize()
 
 Toroidal2dVertexMeshWithMutableSize::~Toroidal2dVertexMeshWithMutableSize()
 {
+    delete mpMeshForVtk;
 }
 
 c_vector<double, 2> Toroidal2dVertexMeshWithMutableSize::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -224,7 +195,7 @@ unsigned Toroidal2dVertexMeshWithMutableSize::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-MutableVertexMesh<2, 2>* Toroidal2dVertexMeshWithMutableSize::GetMeshForVtk()
+VertexMesh<2, 2>* Toroidal2dVertexMeshWithMutableSize::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
@@ -341,8 +312,8 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMeshWithMutableSize::GetMeshForVtk()
         }
     }
 
-    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
-    return p_mesh;
+    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
+    return mpMeshForVtk;
 }
 
 void Toroidal2dVertexMeshWithMutableSize::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height)
@@ -421,6 +392,12 @@ void Toroidal2dVertexMeshWithMutableSize::ConstructFromMeshReader(AbstractMeshRe
     this->mCellRearrangementThreshold = 0.01;
     this->mT2Threshold = 0.001;
     this->mMeshChangesDuringSimulation = true;
+
+    this->mBoxLowerY = 0;
+    this->mBoxUpperY = height;
+    this->mBoxLowerX = 0;
+    this->mBoxUpperX = width;
+    this->mpMeshForVtk = nullptr;
 }
 
 // Serialization for Boost >= 1.36

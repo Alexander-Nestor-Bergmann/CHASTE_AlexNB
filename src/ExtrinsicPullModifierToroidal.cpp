@@ -1,7 +1,6 @@
 #include "ExtrinsicPullModifierToroidal.hpp"
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 
-
 ExtrinsicPullModifierToroidal::ExtrinsicPullModifierToroidal()
     : AbstractCellBasedSimulationModifier<2>(),
       mApplyExtrinsicPullToAllNodes(true),
@@ -9,15 +8,13 @@ ExtrinsicPullModifierToroidal::ExtrinsicPullModifierToroidal()
 {
 }
 
-
 ExtrinsicPullModifierToroidal::~ExtrinsicPullModifierToroidal()
 {
 }
 
-
 void ExtrinsicPullModifierToroidal::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& rCellPopulation)
 {
-    double epsilon = .8;
+    double epsilon = 0.8;
 
     double dt = SimulationTime::Instance()->GetTimeStep();
     unsigned num_nodes = rCellPopulation.GetNumNodes();
@@ -138,31 +135,26 @@ void ExtrinsicPullModifierToroidal::UpdateAtEndOfTimeStep(AbstractCellPopulation
             }
         }
 
-        // Shrink box.
+        // Shrink box
         p_static_cast_mesh_toroidal->SetBoxCoords(1, currentXUpper+mSpeed*dt);
         p_static_cast_mesh_toroidal->SetBoxCoords(2,                                                                     currentYLower+YshrinkSpeed*dt);
         p_static_cast_mesh_toroidal->SetBoxCoords(3,                                                                     currentYUpper-YshrinkSpeed*dt);
     }
 }
 
-
-
 void ExtrinsicPullModifierToroidal::SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)
 {
 }
-
 
 void ExtrinsicPullModifierToroidal::ApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes)
 {
     mApplyExtrinsicPullToAllNodes = applyExtrinsicPullToAllNodes;
 }
 
-
 void ExtrinsicPullModifierToroidal::SetSpeed(double speed)
 {
     mSpeed = speed;
 }
-
 
 void ExtrinsicPullModifierToroidal::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
@@ -172,10 +164,6 @@ void ExtrinsicPullModifierToroidal::OutputSimulationModifierParameters(out_strea
     // Next, call method on direct parent class
     AbstractCellBasedSimulationModifier<2>::OutputSimulationModifierParameters(rParamsFile);
 }
-
-// Explicit instantiation
-class ExtrinsicPullModifierToroidal;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

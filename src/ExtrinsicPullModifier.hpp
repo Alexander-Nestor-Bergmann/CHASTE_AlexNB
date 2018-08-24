@@ -6,7 +6,6 @@
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
-
 class ExtrinsicPullModifier : public AbstractCellBasedSimulationModifier<2,2>
 {
 private:

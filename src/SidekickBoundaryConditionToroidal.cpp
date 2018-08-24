@@ -1,12 +1,10 @@
 #include "SidekickBoundaryConditionToroidal.hpp"
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 
-
 SidekickBoundaryConditionToroidal::SidekickBoundaryConditionToroidal(AbstractCellPopulation<2>* pCellPopulation)
     : AbstractCellPopulationBoundaryCondition<2>(pCellPopulation)
 {
 }
-
 
 void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
 {
@@ -95,11 +93,6 @@ void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<N
 
     }
 
-
-
-
-
-
         // // Iterate over connected nodes
         // for (Node<2>::ContainingElementIterator it = p_node->ContainingElementsBegin();
         //      it != p_node->ContainingElementsEnd();
@@ -139,9 +132,7 @@ void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<N
         //          // std::cout << "/* message */" << '\n';
         //      }
         //  }
-
 }
-
 
 bool SidekickBoundaryConditionToroidal::VerifyBoundaryCondition()
 {
@@ -150,12 +141,10 @@ bool SidekickBoundaryConditionToroidal::VerifyBoundaryCondition()
     return condition_satisfied;
 }
 
-
 void SidekickBoundaryConditionToroidal::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     AbstractCellPopulationBoundaryCondition<2>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

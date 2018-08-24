@@ -1,26 +1,26 @@
 #include "ExtrinsicPullModifier.hpp"
 
-template<unsigned DIM>
-ExtrinsicPullModifier<DIM>::ExtrinsicPullModifier()
-    : AbstractCellBasedSimulationModifier<DIM>(),
+
+ExtrinsicPullModifier::ExtrinsicPullModifier()
+    : AbstractCellBasedSimulationModifier<2>(),
       mApplyExtrinsicPullToAllNodes(true),
       mSpeed(1.0)
 {
 }
 
-template<unsigned DIM>
-ExtrinsicPullModifier<DIM>::~ExtrinsicPullModifier()
+
+ExtrinsicPullModifier::~ExtrinsicPullModifier()
 {
 }
 
-template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+
+void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& rCellPopulation)
 {
     double epsilon = 0.8;
 
     double dt = SimulationTime::Instance()->GetTimeStep();
     unsigned num_nodes = rCellPopulation.GetNumNodes();
-    ChasteCuboid<DIM> bounds = rCellPopulation.rGetMesh().CalculateBoundingBox();
+    ChasteCuboid<2> bounds = rCellPopulation.rGetMesh().CalculateBoundingBox();
     double x_min = bounds.rGetLowerCorner()[0];
     double x_max = bounds.rGetUpperCorner()[0];
 
@@ -30,7 +30,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         double width = x_max - x_min;
         for (unsigned node_index=0; node_index<num_nodes; node_index++)
         {
-            Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
+            Node<2>* p_node = rCellPopulation.GetNode(node_index);
             double speed = mSpeed * (p_node->rGetLocation()[0] - x_min) / width;
 
             // Respect the SidekickBoundaryCondition...
@@ -53,7 +53,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         // Sum the X,Y coords for all points
         for (unsigned node_index=0; node_index<num_nodes; node_index++)
         {
-            Node<DIM>* tempNode = rCellPopulation.GetNode(node_index);
+            Node<2>* tempNode = rCellPopulation.GetNode(node_index);
 
             std::set<unsigned> neighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(node_index);
 
@@ -68,7 +68,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
                 // for (int idx=0; idx<numNeighbours; idx++)
                 for(auto tempNeighbour : neighbourNodes)
                 {
-                    // Node<DIM>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
+                    // Node<2>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
                     std::set<unsigned> tempNeighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(tempNeighbour);
 
                     if (tempNeighbourNodes.size() < 3)
@@ -96,27 +96,33 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         for (unsigned node_index=0; node_index<num_nodes; node_index++)
         {
             // Get the node at this index
-            Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
+            Node<2>* p_node = rCellPopulation.GetNode(node_index);
 
             std::set<unsigned> neighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(node_index);
 
+            // Initialise as not a bounary node
+            p_node->SetAsBoundaryNode(true);
             bool isBoundaryNode = false;
             int numNeighbours = neighbourNodes.size();
             if( numNeighbours < 3 )
             {
                 isBoundaryNode = true;
+                // Update it as a boundary node
+                p_node->SetAsBoundaryNode(true);
             }
             else
             {
                 // for (int idx=0; idx<numNeighbours; idx++)
                 for(auto tempNeighbour : neighbourNodes)
                 {
-                    // Node<DIM>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
+                    // Node<2>* tempNeighbour = rCellPopulation.(neighbourNodes[idx]);
                     std::set<unsigned> tempNeighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(tempNeighbour);
 
                     if (tempNeighbourNodes.size() < 3)
                     {
                         isBoundaryNode = true;
+                        // Update it as a boundary node
+                        p_node->SetAsBoundaryNode(true);
                     }
                 }
             }
@@ -152,7 +158,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
 
                         // Get the x and y coords from the next node in
                         // boundaryNodes to compare against.
-                        Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+                        Node<2>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
                         // Get the coords of the node at the current index in
                         // the ordered list of boundary nodes.
                         double previousX = tempNode->rGetLocation()[0];
@@ -184,7 +190,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         }
 
         // Get the top and bottom rightmost corners of bounding box.
-        double lowerX = bounds.rGetUpperCorner()[0];
+        double lowerX = bounds.rGetLowerCorner()[0];
         double lowerY = bounds.rGetLowerCorner()[1];
         double upperX = bounds.rGetUpperCorner()[0];
         double upperY = bounds.rGetUpperCorner()[1];
@@ -192,7 +198,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         // Make variables to hold indices of nodes closest to bounding box.
         int upperNode = 0;
         int lowerNode = 0;
-        // Euclid distane variables
+        // Euclid distance variables
         double dist2;
         double upperDist = 10000000.; // Initialise as huge
         double lowerDist = 10000000.; // Initialise as huge
@@ -202,7 +208,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         for (unsigned i=0; i < boundaryNodes.size(); i++)
         {
             // Get the node pointer
-            Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+            Node<2>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
 
             // calc dist to upper corner
             xDiff = upperX - tempNode->rGetLocation()[0];
@@ -229,21 +235,21 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
             }
         }
 
-        std::cout << "\n" << '\n';
-        std::cout << "Boundary\n" << '\n';
-        for (unsigned i=0; i < boundaryNodes.size(); i++)
-        {
-            Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
-            cout << tempNode->rGetLocation()[0] << ", ";
-        }
-        std::cout << "\n" << '\n';
-        for (unsigned i=0; i < boundaryNodes.size(); i++)
-        {
-            Node<DIM>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
-            cout << tempNode->rGetLocation()[1] << ", ";
-        }
-        std::cout << "\n" << '\n';
-        std::cout << "PULL\n" << '\n';
+        // std::cout << "\n" << '\n';
+        // std::cout << "Boundary\n" << '\n';
+        // for (unsigned i=0; i < boundaryNodes.size(); i++)
+        // {
+        //     Node<2>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+        //     cout << tempNode->rGetLocation()[0] << ", ";
+        // }
+        // std::cout << "\n" << '\n';
+        // for (unsigned i=0; i < boundaryNodes.size(); i++)
+        // {
+        //     Node<2>* tempNode = rCellPopulation.GetNode(boundaryNodes[i]);
+        //     cout << tempNode->rGetLocation()[1] << ", ";
+        // }
+        // std::cout << "\n" << '\n';
+        // std::cout << "PULL\n" << '\n';
 
         // Iterate over the rightmost nodes and pull them.
         for (unsigned i=0; i < boundaryNodes.size(); i++)
@@ -251,10 +257,18 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
             // If it lies between the top and bottom:
             if( i >= lowerNode && i <= upperNode)
             {
-                Node<DIM>* p_node = rCellPopulation.GetNode(boundaryNodes[i]);
+                Node<2>* p_node = rCellPopulation.GetNode(boundaryNodes[i]);
                 p_node->rGetModifiableLocation()[0] += mSpeed*dt;
 
-                cout << p_node->rGetLocation()[0] << ", " << p_node->rGetLocation()[1] << ", ";
+                // Enfore a y flagpole condition
+                // p_node->ClearAppliedForce();
+
+                // // Enforce a y-flagpole condition
+                // c_vector<double, 2> old_node_location;
+                // old_node_location = rOldLocations.find(p_node)->second;
+                // p_node->rGetModifiableLocation()[1] = old_node_location[1]
+
+                // cout << p_node->rGetLocation()[0] << ", " << p_node->rGetLocation()[1] << ", ";
 
             }
             else if( i > upperNode)
@@ -264,55 +278,41 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
         }
         // std::cout << "\n" << '\n';
 
-
-        // // Pull on the right-most nodes only, with a constant speed
-        // for (unsigned node_index=0; node_index<num_nodes; node_index++)
-        // {
-        //     Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
-        //     if (fabs(p_node->rGetLocation()[0] - x_max) < 0.1)
-        //     {
-        //         p_node->rGetModifiableLocation()[0] += mSpeed*dt;
-        //     }
-        // }
-
-
-
-
     }
 }
 
-template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+
+
+void ExtrinsicPullModifier::SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)
 {
 }
 
-template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::ApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes)
+
+void ExtrinsicPullModifier::ApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes)
 {
     mApplyExtrinsicPullToAllNodes = applyExtrinsicPullToAllNodes;
 }
 
-template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::SetSpeed(double speed)
+
+void ExtrinsicPullModifier::SetSpeed(double speed)
 {
     mSpeed = speed;
 }
 
-template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+
+void ExtrinsicPullModifier::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ApplyExtrinsicPullToAllNodes>" << mApplyExtrinsicPullToAllNodes << "</ApplyExtrinsicPullToAllNodes>\n";
     *rParamsFile << "\t\t\t<Speed>" << mSpeed << "</Speed>\n";
 
     // Next, call method on direct parent class
-    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractCellBasedSimulationModifier<2>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class ExtrinsicPullModifier<1>;
-template class ExtrinsicPullModifier<2>;
-template class ExtrinsicPullModifier<3>;
+class ExtrinsicPullModifier;
+
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ExtrinsicPullModifier)
+CHASTE_CLASS_EXPORT(ExtrinsicPullModifier)

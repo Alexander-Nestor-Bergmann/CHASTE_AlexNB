@@ -14,6 +14,7 @@ void SidekickBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node
     ChasteCuboid<DIM> bounds = this->mpCellPopulation->rGetMesh().CalculateBoundingBox();
     double x_min = bounds.rGetLowerCorner()[0];
     double x_max = bounds.rGetUpperCorner()[0];
+    // double y_max = bounds.rGetUpperCorner()[1];
 
     // Loop over every node
     for (unsigned node_index=0; node_index<this->mpCellPopulation->GetNumNodes(); node_index++)
@@ -31,11 +32,17 @@ void SidekickBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node
                 p_node->rGetModifiableLocation()[0] = old_node_location[0];
             }
 
-           // If the node lies on the right, then revert its x coordinate
-           if (p_node->rGetLocation()[0] > x_max - epsilon)
-           {
-               p_node->rGetModifiableLocation()[0] = old_node_location[0];
-           }
+           // // If the node lies on the right, then revert its x coordinate
+           // if (p_node->rGetLocation()[0] > x_max - epsilon)
+           // {
+           //     p_node->rGetModifiableLocation()[0] = old_node_location[0];
+           // }
+
+           // // Try a y flagpole condition on the pulled end.
+           // if (p_node->rGetLocation()[1] > y_max - epsilon)
+           // {
+           //     p_node->rGetModifiableLocation()[1] = old_node_location[1];
+           // }
         }
     }}
 

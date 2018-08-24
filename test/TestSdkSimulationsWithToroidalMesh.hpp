@@ -1,5 +1,5 @@
-#ifndef TESTSDKSIMULATIONS_HPP_
-#define TESTSDKSIMULATIONS_HPP_
+#ifndef TESTSDKSIMULATIONSWITHTOROIDALMESH_HPP_
+#define TESTSDKSIMULATIONSWITHTOROIDALMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -8,7 +8,6 @@
 
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "NoCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -16,18 +15,21 @@
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 #include "FakePetscSetup.hpp"
-#include "ExtrinsicPullModifier.hpp"
-#include "SidekickBoundaryCondition.hpp"
+#include "ExtrinsicPullModifierToroidal.hpp"
+#include "SidekickBoundaryConditionToroidal.hpp"
 #include "ForceForScenario4.hpp"
+#include "Toroidal2dVertexMeshWithMutableSize.hpp"
+#include "ToroidalHoneycombVertexMeshGeneratorMutable.hpp"
+#include "StressTensor.hpp"
 
 static const double M_DT = 0.1;
-static const double M_RELAXATION_TIME = 10;
-static const double M_EXTENSION_TIME = 10;
+static const double M_RELAXATION_TIME = 9;
+static const double M_EXTENSION_TIME = 300;
 static const double M_VIS_TIME_STEP = 1;
-static const unsigned M_NUM_CELLS_WIDE = 14;
+static const unsigned M_NUM_CELLS_WIDE = 12;
 static const unsigned M_NUM_CELLS_HIGH = 20;
 
-class TestSdkSimulations : public AbstractCellBasedWithTimingsTestSuite
+class TestSdkSimulationsWithToroidalMesh : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
@@ -37,15 +39,19 @@ public:
         bool check_internal_intersections = false;
         bool use_combined_interfaces_for_line_tension = true;
         bool use_distinct_stripe_mismatches_for_combined_interfaces = false;
-        std::string output_name("Scenario3");
+        std::string output_name("TestToroidalConstPull_myparams_Scenario3");
 
         // Specify mechanical parameter values
         // -0.259,0.172
         double k = 1.0;
         double lambda_bar = 0.05;
         double gamma_bar = 0.04;
+        // double lambda_bar = -0.569;
+        // double gamma_bar = 0.145;
         double heterotypic_line_tension_multiplier = 2.0;
         double supercontractile_line_tension_multiplier = 2.0;
+        // double heterotypic_line_tension_multiplier = 0.1;
+        // double supercontractile_line_tension_multiplier = 0.1;
 
         // Initialise various singletons
         SimulationTime::Destroy();
@@ -53,17 +59,13 @@ public:
         CellPropertyRegistry::Instance()->Clear();
         CellId::ResetMaxCellId();
 
-        // Generate a vertex mesh
-        HoneycombVertexMeshGenerator honeycomb_generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH);
-        MutableVertexMesh<2,2>* p_mesh = honeycomb_generator.GetMesh();
+        // Create mesh
+        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH);
+        Toroidal2dVertexMeshWithMutableSize* p_mesh = generator.GetMutableToroidalMesh();
         p_mesh->SetCheckForInternalIntersections(check_internal_intersections);
 
-        std::cout << "/* message */" << '\n';
-        std::cout << p_mesh->GetWidth(1) << '\n';
-        std::cout << "/* message */" << '\n';
-
         // Set the T1 threshold to be very small so there are no exchanges.
-        // p_mesh->SetCellRearrangementThreshold(-1);
+        p_mesh->SetCellRearrangementThreshold(.01);
 
         // Create some non-proliferating cells
         std::vector<CellPtr> cells;
@@ -88,7 +90,7 @@ public:
         simulation.SetEndTime(M_RELAXATION_TIME);
 
         simulation.SetDt(M_DT);
-        unsigned output_time_step_multiple = (unsigned) (0.1*M_RELAXATION_TIME/M_DT);
+        unsigned output_time_step_multiple = (unsigned) (M_VIS_TIME_STEP);
         simulation.SetSamplingTimestepMultiple(output_time_step_multiple);
 
         // Create the appropriate force law(s) for the specified geometry
@@ -100,8 +102,9 @@ public:
         p_force->SetHomotypicLineTensionParameter(lambda_bar*pow(k,1.5));
         p_force->SetHeterotypicLineTensionParameter(heterotypic_line_tension_multiplier*lambda_bar*pow(k,1.5));
         p_force->SetSupercontractileLineTensionParameter(supercontractile_line_tension_multiplier*lambda_bar*pow(k,1.5));
-        p_force->SetBoundaryLineTensionParameter(lambda_bar*lambda_bar*pow(k,1.5));
-        p_force->SetUseCombinedInterfacesForLineTension(false);
+        // p_force->SetBoundaryLineTensionParameter(lambda_bar*lambda_bar*pow(k,1.5));
+        p_force->SetBoundaryLineTensionParameter(lambda_bar*pow(k,1.5));
+        p_force->SetUseCombinedInterfacesForLineTension(use_combined_interfaces_for_line_tension);
 
 
         simulation.AddForce(p_force); // Can also add this after initial solve.
@@ -148,28 +151,29 @@ public:
                 else if ((col%7 == 2) || (col%7 == 5)) { p_cell->GetCellData()->SetItem("stripe", 3); }
                 else                                   { p_cell->GetCellData()->SetItem("stripe", 4); }
             }
+            // Make the last stripe dark blue
+            if( col == M_NUM_CELLS_WIDE-1 )
+            {
+                p_cell->GetCellData()->SetItem("stripe", 1);
+            }
         }
-        // p_force->SetHomotypicLineTensionParameter(lambda_bar*pow(k,1.5));
-        // p_force->SetHeterotypicLineTensionParameter(heterotypic_line_tension_multiplier*lambda_bar*pow(k,1.5));
-        // p_force->SetSupercontractileLineTensionParameter(supercontractile_line_tension_multiplier*lambda_bar*pow(k,1.5));
-        // p_force->SetBoundaryLineTensionParameter(lambda_bar*lambda_bar*pow(k,1.5));
 
         p_force->SetUseCombinedInterfacesForLineTension(use_combined_interfaces_for_line_tension);
         p_force->SetUseDistinctStripeMismatchesForCombinedInterfaces(use_distinct_stripe_mismatches_for_combined_interfaces);
 
-        // // Impose a sliding condition at each boundary
-        // MAKE_PTR_ARGS(SidekickBoundaryCondition<2>, p_bc, (&(simulation.rGetCellPopulation())));
-        // simulation.AddCellPopulationBoundaryCondition(p_bc);
-
         ///\todo work out whether we need to impose the sliding BC here too (!)
-        MAKE_PTR(ExtrinsicPullModifier, p_modifier);
+        MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
-        p_modifier->SetSpeed(0.06);
+        p_modifier->SetSpeed(0.04);
         simulation.AddSimulationModifier(p_modifier);
+
+        // Impose a sliding condition at each boundary
+        MAKE_PTR_ARGS(SidekickBoundaryConditionToroidal, p_bc, (&(simulation.rGetCellPopulation())));
+        simulation.AddCellPopulationBoundaryCondition(p_bc);
 
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);
         simulation.Solve();
     }
 };
 
-#endif /* TESTSDKSIMULATIONS_HPP_*/
+#endif /* TESTSDKSIMULATIONSWITHTOROIDALMESH_HPP_*/

@@ -445,6 +445,60 @@ src/SidekickBoundaryCondition.cpp.s:
 	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/SidekickBoundaryCondition.cpp.s
 .PHONY : src/SidekickBoundaryCondition.cpp.s
 
+src/StripeStatisticsWriter.o: src/StripeStatisticsWriter.cpp.o
+
+.PHONY : src/StripeStatisticsWriter.o
+
+# target to build an object file
+src/StripeStatisticsWriter.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/StripeStatisticsWriter.cpp.o
+.PHONY : src/StripeStatisticsWriter.cpp.o
+
+src/StripeStatisticsWriter.i: src/StripeStatisticsWriter.cpp.i
+
+.PHONY : src/StripeStatisticsWriter.i
+
+# target to preprocess a source file
+src/StripeStatisticsWriter.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/StripeStatisticsWriter.cpp.i
+.PHONY : src/StripeStatisticsWriter.cpp.i
+
+src/StripeStatisticsWriter.s: src/StripeStatisticsWriter.cpp.s
+
+.PHONY : src/StripeStatisticsWriter.s
+
+# target to generate assembly for a file
+src/StripeStatisticsWriter.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/StripeStatisticsWriter.cpp.s
+.PHONY : src/StripeStatisticsWriter.cpp.s
+
+src/Toroidal2dVertexMeshWithMutableSize.o: src/Toroidal2dVertexMeshWithMutableSize.cpp.o
+
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.o
+
+# target to build an object file
+src/Toroidal2dVertexMeshWithMutableSize.cpp.o:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/Toroidal2dVertexMeshWithMutableSize.cpp.o
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.cpp.o
+
+src/Toroidal2dVertexMeshWithMutableSize.i: src/Toroidal2dVertexMeshWithMutableSize.cpp.i
+
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.i
+
+# target to preprocess a source file
+src/Toroidal2dVertexMeshWithMutableSize.cpp.i:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/Toroidal2dVertexMeshWithMutableSize.cpp.i
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.cpp.i
+
+src/Toroidal2dVertexMeshWithMutableSize.s: src/Toroidal2dVertexMeshWithMutableSize.cpp.s
+
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.s
+
+# target to generate assembly for a file
+src/Toroidal2dVertexMeshWithMutableSize.cpp.s:
+	cd /home/chaste && $(MAKE) -f projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/build.make projects/AlexNB/CMakeFiles/chaste_project_AlexNB.dir/src/Toroidal2dVertexMeshWithMutableSize.cpp.s
+.PHONY : src/Toroidal2dVertexMeshWithMutableSize.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -488,6 +542,12 @@ help:
 	@echo "... src/SidekickBoundaryCondition.o"
 	@echo "... src/SidekickBoundaryCondition.i"
 	@echo "... src/SidekickBoundaryCondition.s"
+	@echo "... src/StripeStatisticsWriter.o"
+	@echo "... src/StripeStatisticsWriter.i"
+	@echo "... src/StripeStatisticsWriter.s"
+	@echo "... src/Toroidal2dVertexMeshWithMutableSize.o"
+	@echo "... src/Toroidal2dVertexMeshWithMutableSize.i"
+	@echo "... src/Toroidal2dVertexMeshWithMutableSize.s"
 .PHONY : help
 
 

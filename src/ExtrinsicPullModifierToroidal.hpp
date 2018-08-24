@@ -1,5 +1,5 @@
-#ifndef EXTRINSICPULLMODIFIER_HPP_
-#define EXTRINSICPULLMODIFIER_HPP_
+#ifndef EXTRINSICPULLMODIFIERTOROIDAL_HPP_
+#define EXTRINSICPULLMODIFIERTOROIDAL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -7,7 +7,7 @@
 #include "AbstractCellBasedSimulationModifier.hpp"
 
 
-class ExtrinsicPullModifier : public AbstractCellBasedSimulationModifier<2,2>
+class ExtrinsicPullModifierToroidal : public AbstractCellBasedSimulationModifier<2,2>
 {
 private:
 
@@ -38,12 +38,12 @@ public:
     /**
      * Default constructor.
      */
-    ExtrinsicPullModifier();
+    ExtrinsicPullModifierToroidal();
 
     /**
      * Destructor.
      */
-    virtual ~ExtrinsicPullModifier();
+    virtual ~ExtrinsicPullModifierToroidal();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -84,6 +84,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(ExtrinsicPullModifier)
+CHASTE_CLASS_EXPORT(ExtrinsicPullModifierToroidal)
 
-#endif /*EXTRINSICPULLMODIFIER_HPP_*/
+#endif /*EXTRINSICPULLMODIFIERTOROIDAL_HPP_*/

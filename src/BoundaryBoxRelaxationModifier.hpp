@@ -1,12 +1,13 @@
-#ifndef EXTRINSICPULLMODIFIERTOROIDAL_HPP_
-#define EXTRINSICPULLMODIFIERTOROIDAL_HPP_
+#ifndef BOUNDARYBOXRELAXATIONMODIFIER_HPP_
+#define BOUNDARYBOXRELAXATIONMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
+#include "FarhadifarForce.hpp"
 
-class ExtrinsicPullModifierToroidal : public AbstractCellBasedSimulationModifier<2,2>
+class BoundaryBoxRelaxationModifier : public AbstractCellBasedSimulationModifier<2,2>
 {
 private:
 
@@ -23,28 +24,25 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<2,2> >(*this);
-        archive & mApplyExtrinsicPullToAllNodes;
-        archive & mPinAnteriorMostCells;
-        archive & mSpeed;
-        archive & mApplyExtrinsicPull;
+        archive & mStiffness;
+        archive & mRelaxPeriodicBox;
     }
 
-    bool mApplyExtrinsicPullToAllNodes;
-    bool mPinAnteriorMostCells;
-    double mSpeed;
-    bool mApplyExtrinsicPull;
+    double mStiffness;
+    bool mRelaxPeriodicBox;
+    boost::shared_ptr<FarhadifarForce<2> > mpForce;
 
 public:
 
     /**
      * Default constructor.
      */
-    ExtrinsicPullModifierToroidal();
+    BoundaryBoxRelaxationModifier();
 
     /**
      * Destructor.
      */
-    virtual ~ExtrinsicPullModifierToroidal();
+    virtual ~BoundaryBoxRelaxationModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -65,20 +63,20 @@ public:
      */
     virtual void SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory);
 
-    /**
-     * @param applyExtrinsicPullToAllNodes whether to apply the extrinsic pull to all nodes in the tissue
+        /**
+     * @param relaxPeriodicBox: whether to allow the box to change shape to dissipate stress.
      */
-    void ApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes);
+    void RelaxPeriodicBox(bool relaxPeriodicBox);
 
     /**
-     * @param speed the speed of the extrinsic pull
+     * @param stiffness the stiffness of the surrounding tissue.
      */
-    void SetSpeed(double speed);
+    void SetStiffness(double stiffness);
 
     /**
-     * @param applyExtrinsicPull whether to apply the extrinsic pull at all.
-     */
-    void ApplyExtrinsicPull(bool applyExtrinsicPullToAllNodes);
+     * @param p_force. Pointer to simulation farhadifar force.
+    */
+    void SetForcePointer(boost::shared_ptr<FarhadifarForce<2> > p_force);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -90,6 +88,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(ExtrinsicPullModifierToroidal)
+CHASTE_CLASS_EXPORT(BoundaryBoxRelaxationModifier)
 
-#endif /*EXTRINSICPULLMODIFIERTOROIDAL_HPP_*/
+#endif /*BOUNDARYBOXRELAXATIONMODIFIER_HPP_*/

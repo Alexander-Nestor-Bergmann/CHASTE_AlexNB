@@ -20,12 +20,19 @@
 #include "ForceForScenario4.hpp"
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 #include "ToroidalHoneycombVertexMeshGeneratorMutable.hpp"
+#include "BoundaryBoxRelaxationModifier.hpp"
+#include "StressTensor.hpp"
+#include <Eigen/Dense>
 
-static const double M_DT = 0.1;
-static const double M_RELAXATION_TIME = 9;
-static const double M_EXTENSION_TIME = 300;
-static const double M_VIS_TIME_STEP = 10;
-static const unsigned M_NUM_CELLS_WIDE = 12;
+static const double M_DT = 0.5; // 0.1
+static const double M_RELAXATION_TIME = 12;
+static const double M_EXTENSION_TIME = 500;
+static const double M_VIS_TIME_STEP = 50;
+static const double M_PULL = 0.01; // 0.04 max
+static const bool M_APPLY_EXTRINSIC_PULL = false; // 0.04 max
+static const bool M_RELAX_PERIODIC_BOX = true; // 0.04 max
+static const double M_TISSUE_STIFFNESS = 500;
+static const unsigned M_NUM_CELLS_WIDE = 14;
 static const unsigned M_NUM_CELLS_HIGH = 20;
 
 class TestSdkSimulationsWithToroidalMesh : public AbstractCellBasedWithTimingsTestSuite
@@ -36,21 +43,20 @@ public:
     {
         // Specify simulation rules
         bool check_internal_intersections = false;
-        bool use_combined_interfaces_for_line_tension = false;
+        bool use_combined_interfaces_for_line_tension = true;
         bool use_distinct_stripe_mismatches_for_combined_interfaces = false;
-        std::string output_name("TestToroidalConstPull_Scenario2");
+        std::string output_name("TestToroidalConstPull_autoRelax_Scenario2");
 
         // Specify mechanical parameter values
         // -0.259,0.172
         double k = 1.0;
-        double lambda_bar = 0.05;
+        double lambda_bar = 0.05; // Area = 0.69496417 for L,G = 0.05, 0.04
         double gamma_bar = 0.04;
         // double lambda_bar = -0.569;
         // double gamma_bar = 0.145;
         double heterotypic_line_tension_multiplier = 2.0;
         double supercontractile_line_tension_multiplier = 2.0;
-        // double heterotypic_line_tension_multiplier = 0.1;
-        // double supercontractile_line_tension_multiplier = 0.1;
+
 
         // Initialise various singletons
         SimulationTime::Destroy();
@@ -59,7 +65,7 @@ public:
         CellId::ResetMaxCellId();
 
         // Create mesh
-        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH);
+        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.66584922);
         Toroidal2dVertexMeshWithMutableSize* p_mesh = generator.GetMutableToroidalMesh();
         p_mesh->SetCheckForInternalIntersections(check_internal_intersections);
 
@@ -115,6 +121,14 @@ public:
         // Run simulation
         simulation.Solve();
 
+        // Before bestowing stripes, set the reference stress about which to relax as the starting stress.
+        p_mesh->SetReferenceStress(cell_population, p_force.get(), false);
+        // // StressTensor
+        // c_matrix<double, 2,2> stressTensorPre = GetTissueStressTensor(cell_population, p_force.get());
+        // // Output the tensor.
+        // std::cout << stressTensorPre(0,0) << ", " << stressTensorPre(0,1) << '\n';
+        // std::cout << stressTensorPre(1,0) << ", " << stressTensorPre(1,1) << '\n';
+
         // Bestow cell stripe identities
         for (unsigned i=0; i<simulation.rGetCellPopulation().GetNumRealCells(); i++)
         {
@@ -150,28 +164,64 @@ public:
                 else if ((col%7 == 2) || (col%7 == 5)) { p_cell->GetCellData()->SetItem("stripe", 3); }
                 else                                   { p_cell->GetCellData()->SetItem("stripe", 4); }
             }
-            // Make the last stripe dark blue
-            if( col == M_NUM_CELLS_WIDE-1 )
-            {
-                p_cell->GetCellData()->SetItem("stripe", 1);
-            }
+            // // Make the last stripe dark blue
+            // if( col == M_NUM_CELLS_WIDE-1 )
+            // {
+            //     p_cell->GetCellData()->SetItem("stripe", 1);
+            // }
         }
 
         p_force->SetUseCombinedInterfacesForLineTension(use_combined_interfaces_for_line_tension);
         p_force->SetUseDistinctStripeMismatchesForCombinedInterfaces(use_distinct_stripe_mismatches_for_combined_interfaces);
 
-        ///\todo work out whether we need to impose the sliding BC here too (!)
+        // // Set the reference stress about which to relax as the starting stress. Here is with stripes.
+        // p_mesh->SetReferenceStress(cell_population);
+
+        // Extrinsic pull
         MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
-        p_modifier->SetSpeed(0.04);
+        p_modifier->ApplyExtrinsicPull(M_APPLY_EXTRINSIC_PULL);
+        // p_modifier->RelaxPeriodicBox(M_RELAX_PERIODIC_BOX);
+        p_modifier->SetSpeed(M_PULL);
         simulation.AddSimulationModifier(p_modifier);
+
+        // Relaxing the boundary
+        MAKE_PTR(BoundaryBoxRelaxationModifier, p_boundary_modifier);
+        p_boundary_modifier->RelaxPeriodicBox(M_RELAX_PERIODIC_BOX);
+        p_boundary_modifier->SetStiffness(M_TISSUE_STIFFNESS);
+        p_boundary_modifier->SetForcePointer(p_force);
+        simulation.AddSimulationModifier(p_boundary_modifier);
 
         // Impose a sliding condition at each boundary
         MAKE_PTR_ARGS(SidekickBoundaryConditionToroidal, p_bc, (&(simulation.rGetCellPopulation())));
         simulation.AddCellPopulationBoundaryCondition(p_bc);
 
+        // Run the simulation
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);
         simulation.Solve();
+
+
+        // StressTensor
+        c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population, p_force.get());
+        // Convert to Eigen::Matrix type
+        Eigen::Matrix2d eigenStressTensor(2,2);
+        // Assign values
+        // eigenStressTensor << 1, 2, 3, 4;
+        eigenStressTensor(0,0) = stressTensor2d(0,0);
+        eigenStressTensor(0,1) = stressTensor2d(0,1);
+        eigenStressTensor(1,0) = stressTensor2d(1,0);
+        eigenStressTensor(1,1) = stressTensor2d(1,1);
+        // Output the tensor.
+        std::cout << eigenStressTensor << '\n';
+        // Create the solver
+        Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(eigenStressTensor);
+        // Check for success.
+        if (eigensolver.info() != Eigen::Success) abort();
+        // Output results
+        cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
+        cout << "Here's a matrix whose columns are eigenvectors of A \n"
+            << "corresponding to these eigenvalues:\n"
+            << eigensolver.eigenvectors() << endl;
     }
 };
 

@@ -29,9 +29,9 @@
 static const double M_DT = 0.1;
 static const double M_RELAXATION_TIME = 20;
 static const double M_VIS_TIME_STEP = 1;
-static const unsigned M_NUM_CELLS_WIDE = 40;
-static const unsigned M_NUM_CELLS_HIGH = 40;
-static const double M_PULL = 0.05;
+static const unsigned M_NUM_CELLS_WIDE = 10;
+static const unsigned M_NUM_CELLS_HIGH = 10;
+static const double M_PULL = 0.02;
 
 class TestStressTensor : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -47,7 +47,7 @@ public:
         CellId::ResetMaxCellId();
 
         // Create mesh
-        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH);
+        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.65381798);
         Toroidal2dVertexMeshWithMutableSize* p_mesh = generator.GetMutableToroidalMesh();
         p_mesh->SetCheckForInternalIntersections(false);
 
@@ -67,7 +67,7 @@ public:
         simulation.SetEndTime(M_RELAXATION_TIME);
 
         simulation.SetDt(M_DT);
-        unsigned output_time_step_multiple = (unsigned) (0.1*M_RELAXATION_TIME/M_DT);
+        unsigned output_time_step_multiple = (unsigned) (M_VIS_TIME_STEP);
         std::cout << 0.1*M_RELAXATION_TIME/M_DT << '\n';
         simulation.SetSamplingTimestepMultiple(output_time_step_multiple);
 
@@ -80,17 +80,19 @@ public:
         MAKE_PTR(ConstantTargetAreaModifier<2>, p_growth_modifier);
         simulation.AddSimulationModifier(p_growth_modifier);
 
-        ///\todo work out whether we need to impose the sliding BC here too (!)
-        MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
-        p_modifier->ApplyExtrinsicPullToAllNodes(false);
-        p_modifier->SetSpeed(0.04);
-        simulation.AddSimulationModifier(p_modifier);
+        // ///\todo work out whether we need to impose the sliding BC here too (!)
+        // MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
+        // p_modifier->ApplyExtrinsicPullToAllNodes(false);
+        // p_modifier->SetSpeed(M_PULL);
+        // simulation.AddSimulationModifier(p_modifier);
 
         // solve
         simulation.Solve();
 
         // StressTensor
-        c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population);
+        // StressTensor<2> stressTensorObject;
+        // c_matrix<double, 2,2> stressTensor2d = stressTensorObject.GetTissueStressTensor(cell_population);
+        c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population, p_force.get());
         // Convert to Eigen::Matrix type
         Eigen::Matrix2d eigenStressTensor(2,2);
         // Assign values
@@ -107,7 +109,7 @@ public:
         if (eigensolver.info() != Eigen::Success) abort();
         // Output results
         cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
-       cout << "Here's a matrix whose columns are eigenvectors of A \n"
+        cout << "Here's a matrix whose columns are eigenvectors of A \n"
             << "corresponding to these eigenvalues:\n"
             << eigensolver.eigenvectors() << endl;
 

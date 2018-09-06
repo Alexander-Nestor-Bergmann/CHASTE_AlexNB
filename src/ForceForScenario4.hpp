@@ -57,6 +57,8 @@ public:
 
     double GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
 
+    void SetBoundaryBoxRelaxation(VertexBasedCellPopulation<2>& rVertexCellPopulation);
+
     void SetHomotypicLineTensionParameter(double homotypicLineTensionParameter);
     void SetHeterotypicLineTensionParameter(double heterotypicLineTensionParameter);
     void SetSupercontractileLineTensionParameter(double supercontractileLineTensionParameter);

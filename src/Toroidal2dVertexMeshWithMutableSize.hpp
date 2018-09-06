@@ -4,7 +4,9 @@
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
+#include "AbstractCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
+#include "FarhadifarForce.hpp"
 
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
@@ -32,6 +34,9 @@ private:
     double mBoxUpperY;
     double mBoxLowerX;
     double mBoxUpperX;
+
+    /** Reference stress tensor. */
+    c_matrix<double, 2,2> mReferenceStress;
 
     /**
      * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
@@ -128,16 +133,25 @@ public:
      */
     double GetWidth(const unsigned& rDimension) const;
 
-    // /**
-    //  * New SetWidth() method.
-    //  *
-    //  * Calculate the 'width' of any dimension of the mesh, taking periodicity
-    //  * into account.
-    //  *
-    //  * @param rDimension a dimension (0 or 1)
-    //  * @return The maximum distance between any nodes in this dimension.
-    //  */
-    // void SetWidth(const unsigned& rDimension, double width);
+    /**
+     * New SetWidth() method.
+     *
+     * Calculate the 'width' of any dimension of the mesh, taking periodicity
+     * into account.
+     *
+     * @param rDimension a dimension (0 or 1)
+     * @return The maximum distance between any nodes in this dimension.
+     */
+    void SetWidth(const unsigned& rDimension, double width);
+
+    /**
+     * New GetNearestNodeIndexIgnorePeriodicity() method.
+     *
+     * Calculates the index of the node closest to the given vector, but doesn't account for periodicity.
+     * @param rTestPoint reference to the point
+     * @return node index
+     */
+     unsigned GetNearestNodeIndexIgnorePeriodicity(const ChastePoint<2>& rTestPoint);
 
     /**
      * New GetBoxCoords method.
@@ -160,6 +174,47 @@ public:
      * @param newVal new position that corners will be moved to
      */
     void SetBoxCoords(const unsigned& rDimension, double newVal);
+
+    /**
+     * New RefitPeriodicBox method.
+     *
+     * Change re-find the corners of the periodic box, given the width and
+     * height.
+     *
+     * @param rDimension. References which coord is being changed according to
+     * 0, 1, 2, 3 = mBoxLowerX, mBoxUpperX, mBoxLowerY, mBoxUpperY
+     * @param newVal new position that corners will be moved to
+     */
+    void RefitPeriodicBox();
+
+    /**
+     * New GetBoundaryNodes method.
+     *
+     * Return boundary nodes in the tissue.
+     *
+     */
+     std::set<unsigned> GetBoundaryNodes();
+
+     /**
+      * New SetReferenceStress() method.
+      *
+      * Sets the stress tensor of the inital tissue. This stress is then used as
+      * a base state, about which relaxation is done.
+      *
+      * @param rCellPopulation The reference cell population to get stress from
+      * @param useZero. Boolean check to use zero stress as base.
+      */
+     void SetReferenceStress(AbstractCellPopulation<2,2>& rCellPopulation, FarhadifarForce<2>* p_force, bool useZero = false);
+
+     /**
+      * New RelaxPeriodicBox() method.
+      *
+      * Calculates the x&y componets of tissue stress and relaxes the box in
+      * response via contractions/expansions.
+      *
+      * @param rCellPopulation The reference cell population to get stress from
+      */
+     void RelaxPeriodicBox(AbstractCellPopulation<2,2>& rCellPopulation, FarhadifarForce<2>* p_force, double stiffness = 1000);
 
     /**
      * Overridden AddNode() method.

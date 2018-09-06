@@ -1,9 +1,11 @@
 #include "ToroidalHoneycombVertexMeshGeneratorMutable.hpp"
+#include "Toroidal2dVertexMeshWithMutableSize.hpp"
 
 ToroidalHoneycombVertexMeshGeneratorMutable::ToroidalHoneycombVertexMeshGeneratorMutable(unsigned numElementsAcross,
    unsigned numElementsUp,
    double cellRearrangementThreshold,
-   double t2Threshold)
+   double t2Threshold,
+   double elementArea)
 {
     // numElementsAcross and numElementsUp must be even for toroidal meshes
     assert(numElementsAcross > 1);
@@ -80,6 +82,22 @@ ToroidalHoneycombVertexMeshGeneratorMutable::ToroidalHoneycombVertexMeshGenerato
     double mesh_height = 1.5*numElementsUp/sqrt(3.0);
 
     mpMesh = new Toroidal2dVertexMeshWithMutableSize(mesh_width, mesh_height, nodes, elements, cellRearrangementThreshold, t2Threshold);
+
+    // Scale the mesh so that each element's area takes the value elementArea
+    if( elementArea != 0 )
+    {
+        assert(elementArea > 0);
+
+        mpMesh->Scale(sqrt(elementArea*2.0/sqrt(3.0)), sqrt(elementArea*2.0/sqrt(3.0)));
+
+        Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(mpMesh);
+        double height = p_static_cast_mesh_toroidal->GetWidth(1);
+        double width = p_static_cast_mesh_toroidal->GetWidth(0);
+        p_static_cast_mesh_toroidal->SetWidth(0, width * sqrt(elementArea*2.0/sqrt(3.0)));
+        p_static_cast_mesh_toroidal->SetWidth(1, height * sqrt(elementArea*2.0/sqrt(3.0)));
+        p_static_cast_mesh_toroidal->SetBoxCoords(1, width * sqrt(elementArea*2.0/sqrt(3.0)));
+        p_static_cast_mesh_toroidal->SetBoxCoords(3, height * sqrt(elementArea*2.0/sqrt(3.0)));
+    }
 }
 
 MutableVertexMesh<2,2>* ToroidalHoneycombVertexMeshGeneratorMutable::GetMesh()

@@ -29,7 +29,8 @@ public:
     ToroidalHoneycombVertexMeshGeneratorMutable(unsigned numElementsAcross,
                                          unsigned numElementsUp,
                                          double cellRearrangementThreshold=0.01,
-                                         double t2Threshold=0.001);
+                                         double t2Threshold=0.001,
+                                        double elementArea=0);
     /**
      * @return a 2D honeycomb mesh
      */

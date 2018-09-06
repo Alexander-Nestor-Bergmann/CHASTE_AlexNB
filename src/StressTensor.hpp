@@ -6,6 +6,7 @@
 
 #include "MutableVertexMesh.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "FarhadifarForce.hpp"
 
 //
 // class StressTensor
@@ -49,7 +50,7 @@
      * @param rCellPopulation reference to the cell population
      * @param elementIndex reference to the cell population
      */
-    c_matrix<double, 2,2> GetSingleCellStressTensor(AbstractCellPopulation<2,2>& rCellPopulation, unsigned elementIndex);
+    c_matrix<double, 2,2> GetSingleCellStressTensor(AbstractCellPopulation<2,2>& rCellPopulation, FarhadifarForce<2>* p_force, unsigned elementIndex);
 
     /**
      * GetTissueStressTensor() method.
@@ -58,7 +59,7 @@
      *
      * @param rCellPopulation reference to the cell population
      */
-    c_matrix<double, 2,2> GetTissueStressTensor(AbstractCellPopulation<2,2>& rCellPopulation);
+    c_matrix<double, 2,2> GetTissueStressTensor(AbstractCellPopulation<2,2>& rCellPopulation, FarhadifarForce<2>* p_force);
 
 // };
 

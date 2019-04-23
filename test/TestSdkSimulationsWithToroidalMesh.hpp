@@ -25,15 +25,20 @@
 #include <Eigen/Dense>
 
 static const double M_DT = 0.5; // 0.1
-static const double M_RELAXATION_TIME = 12;
-static const double M_EXTENSION_TIME = 500;
-static const double M_VIS_TIME_STEP = 50;
-static const double M_PULL = 0.01; // 0.04 max
-static const bool M_APPLY_EXTRINSIC_PULL = false; // 0.04 max
-static const bool M_RELAX_PERIODIC_BOX = true; // 0.04 max
-static const double M_TISSUE_STIFFNESS = 500;
-static const unsigned M_NUM_CELLS_WIDE = 14;
-static const unsigned M_NUM_CELLS_HIGH = 20;
+static const double M_RELAXATION_TIME = 3;
+static const double M_EXTENSION_TIME = 1500;
+static const double M_VIS_TIME_STEP = 20;
+static const double M_PULL = 0.01; // 0.005 good 0.04 max
+static const bool M_APPLY_EXTRINSIC_PULL = true;
+static const bool M_RELAX_PERIODIC_BOX = true;
+static const bool M_APPLY_FLAGPOLE_CONDITION = true;
+static const double M_TISSUE_STIFFNESS = 2000; // 500 for a 14x20 tissue, 2000 for 28x40
+static const unsigned M_NUM_CELLS_WIDE = 28; // 14
+static const unsigned M_NUM_CELLS_HIGH = 40; // 20
+static const double M_ROSETTE_PROBABILITY = 0;
+
+// NOTE Mesh is will only flip cells from top to bottom, not left to right. To
+// change this turn on the "SetNode" functions for the x-axis.
 
 class TestSdkSimulationsWithToroidalMesh : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -55,7 +60,7 @@ public:
         // double lambda_bar = -0.569;
         // double gamma_bar = 0.145;
         double heterotypic_line_tension_multiplier = 2.0;
-        double supercontractile_line_tension_multiplier = 2.0;
+        double supercontractile_line_tension_multiplier = 8.0; // 8.0 for scenario 4, 2.0 for normal
 
 
         // Initialise various singletons
@@ -71,6 +76,9 @@ public:
 
         // Set the T1 threshold to be very small so there are no exchanges.
         p_mesh->SetCellRearrangementThreshold(.01);
+
+        // Enforce rosettes rather than doing T1s
+        p_mesh->SetProtorosetteFormationProbability(M_ROSETTE_PROBABILITY);
 
         // Create some non-proliferating cells
         std::vector<CellPtr> cells;
@@ -193,8 +201,11 @@ public:
         simulation.AddSimulationModifier(p_boundary_modifier);
 
         // Impose a sliding condition at each boundary
-        MAKE_PTR_ARGS(SidekickBoundaryConditionToroidal, p_bc, (&(simulation.rGetCellPopulation())));
-        simulation.AddCellPopulationBoundaryCondition(p_bc);
+        if (M_APPLY_FLAGPOLE_CONDITION)
+        {
+            MAKE_PTR_ARGS(SidekickBoundaryConditionToroidal, p_bc, (&(simulation.rGetCellPopulation())));
+            simulation.AddCellPopulationBoundaryCondition(p_bc);
+        }
 
         // Run the simulation
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);

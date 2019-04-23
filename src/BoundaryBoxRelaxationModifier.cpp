@@ -80,7 +80,6 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
                 p_node->rGetModifiableLocation()[0] += deltaX;
             }
         }
-
         // Reset the size of the box
         p_mesh->SetBoxCoords(0, currentXLower + deltaX);
         p_mesh->SetBoxCoords(1, currentXUpper - deltaX);

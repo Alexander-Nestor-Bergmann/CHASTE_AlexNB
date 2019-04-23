@@ -87,12 +87,12 @@ void Toroidal2dVertexMeshWithMutableSize::SetNode(unsigned nodeIndex, ChastePoin
     if (y_coord > mBoxUpperY)
     {
         // Move point down
-        // point.SetCoordinate(1, y_coord - mHeight);
+        point.SetCoordinate(1, y_coord - mHeight);
     }
     else if (y_coord < mBoxLowerY)
     {
         // // Move point up
-        // point.SetCoordinate(1, y_coord + mHeight);
+        point.SetCoordinate(1, y_coord + mHeight);
 
         // Fix the bottom at box.
         // point.SetCoordinate(1, mBoxLowerY);
@@ -123,12 +123,12 @@ void Toroidal2dVertexMeshWithMutableSize::SetWidth(const unsigned& rDimension, d
     if (rDimension == 0)
     {
         mWidth = width;
-        mBoxUpperX = width;
+        // mBoxUpperX = width;
     }
     else
     {
         mHeight = width;
-        mBoxUpperY = width;
+        // mBoxUpperY = width;
     }
 
 }
@@ -363,8 +363,8 @@ void Toroidal2dVertexMeshWithMutableSize::RelaxPeriodicBox(AbstractCellPopulatio
                                 mBoxLowerX-boxCentroidX);
     double anglex0y1 = std::atan2(mBoxUpperY-boxCentroidY,
                                 mBoxLowerX-boxCentroidX);
-    double anglex1y1 = std::atan2(mBoxUpperY-boxCentroidY,
-                                mBoxUpperX-boxCentroidX);
+    // double anglex1y1 = std::atan2(mBoxUpperY-boxCentroidY,
+    //                             mBoxUpperX-boxCentroidX);
     double anglex1y0 = std::atan2(mBoxLowerY-boxCentroidY,
                                 mBoxUpperX-boxCentroidX);
 

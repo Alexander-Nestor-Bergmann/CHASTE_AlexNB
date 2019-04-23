@@ -9,7 +9,7 @@ SidekickBoundaryConditionToroidal::SidekickBoundaryConditionToroidal(AbstractCel
 void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
 {
 
-    // Pointer to mesh
+    // Pointer to mesh -- 
     AbstractMesh<2, 2>& r_mesh = this->mpCellPopulation->rGetMesh();
     Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&r_mesh);
 

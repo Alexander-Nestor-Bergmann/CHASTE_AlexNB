@@ -9,7 +9,7 @@ SidekickBoundaryConditionToroidal::SidekickBoundaryConditionToroidal(AbstractCel
 void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
 {
 
-    // Pointer to mesh -- 
+    // Pointer to mesh --
     AbstractMesh<2, 2>& r_mesh = this->mpCellPopulation->rGetMesh();
     Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&r_mesh);
 
@@ -54,7 +54,7 @@ void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<N
              p_node->rGetModifiableLocation()[0] = old_node_location[0];
          }
     }
-    p_static_cast_mesh_toroidal->SetBoxCoords(0, 0);
+    // p_static_cast_mesh_toroidal->SetBoxCoords(0, 0);
     // p_static_cast_mesh_toroidal->RefitPeriodicBox();
 
 

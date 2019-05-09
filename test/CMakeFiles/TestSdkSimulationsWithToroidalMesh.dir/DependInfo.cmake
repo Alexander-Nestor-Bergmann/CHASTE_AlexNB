@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/chaste/src/projects/AlexNB/apps/src/ExampleApp.cpp" "/home/chaste/projects/AlexNB/apps/CMakeFiles/ExampleApp.dir/src/ExampleApp.cpp.o"
+  "/home/chaste/projects/AlexNB/test/TestSdkSimulationsWithToroidalMesh.cpp" "/home/chaste/projects/AlexNB/test/CMakeFiles/TestSdkSimulationsWithToroidalMesh.dir/TestSdkSimulationsWithToroidalMesh.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -127,6 +127,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "src/global/src/checkpointing"
   "src/global/src/timing"
   "src/global/src/fortests"
+  "src/projects/AlexNB/test"
   "cxxtest"
   )
 

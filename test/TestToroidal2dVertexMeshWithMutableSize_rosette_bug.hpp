@@ -27,20 +27,20 @@
 static const double M_DT = 0.5; // 0.1
 static const double M_RELAXATION_TIME = 3;
 static const double M_EXTENSION_TIME = 1500;
-static const double M_VIS_TIME_STEP = 20;
+static const double M_VIS_TIME_STEP = 1;
 static const double M_PULL = 0.01; // 0.005 good 0.04 max
 static const bool M_APPLY_EXTRINSIC_PULL = true;
 static const bool M_RELAX_PERIODIC_BOX = true;
 static const bool M_APPLY_FLAGPOLE_CONDITION = true;
-static const double M_TISSUE_STIFFNESS = 2000; // 500 for a 14x20 tissue, 2000 for 28x40
-static const unsigned M_NUM_CELLS_WIDE = 28; // 14
-static const unsigned M_NUM_CELLS_HIGH = 40; // 20
-static const double M_ROSETTE_PROBABILITY = 0;
+static const double M_TISSUE_STIFFNESS = 500; // 500 for a 14x20 tissue, 2000 for 28x40
+static const unsigned M_NUM_CELLS_WIDE = 14; // 14
+static const unsigned M_NUM_CELLS_HIGH = 20; // 20
+static const double M_ROSETTE_PROBABILITY = 0.5;
 
 // NOTE Mesh is will only flip cells from top to bottom, not left to right. To
 // change this turn on the "SetNode" functions for the x-axis.
 
-class TestSdkSimulationsWithToroidalMesh : public AbstractCellBasedWithTimingsTestSuite
+class TestSdkSimulationsWithToroidalMeshRosetteBug : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
@@ -50,7 +50,7 @@ public:
         bool check_internal_intersections = false;
         bool use_combined_interfaces_for_line_tension = true;
         bool use_distinct_stripe_mismatches_for_combined_interfaces = false;
-        std::string output_name("TestToroidalConstPull_autoRelax_Scenario2");
+        std::string output_name("TestRosetteError");
 
         // Specify mechanical parameter values
         // -0.259,0.172
@@ -76,6 +76,7 @@ public:
 
         // Set the T1 threshold to be very small so there are no exchanges.
         p_mesh->SetCellRearrangementThreshold(.01);
+        // p_mesh->SetT2Threshold(0);
 
         // Enforce rosettes rather than doing T1s
         p_mesh->SetProtorosetteFormationProbability(M_ROSETTE_PROBABILITY);
@@ -211,28 +212,6 @@ public:
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);
         simulation.Solve();
 
-
-        // StressTensor
-        c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population, p_force.get());
-        // Convert to Eigen::Matrix type
-        Eigen::Matrix2d eigenStressTensor(2,2);
-        // Assign values
-        // eigenStressTensor << 1, 2, 3, 4;
-        eigenStressTensor(0,0) = stressTensor2d(0,0);
-        eigenStressTensor(0,1) = stressTensor2d(0,1);
-        eigenStressTensor(1,0) = stressTensor2d(1,0);
-        eigenStressTensor(1,1) = stressTensor2d(1,1);
-        // Output the tensor.
-        std::cout << eigenStressTensor << '\n';
-        // Create the solver
-        Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(eigenStressTensor);
-        // Check for success.
-        if (eigensolver.info() != Eigen::Success) abort();
-        // Output results
-        cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
-        cout << "Here's a matrix whose columns are eigenvectors of A \n"
-            << "corresponding to these eigenvalues:\n"
-            << eigensolver.eigenvectors() << endl;
     }
 };
 

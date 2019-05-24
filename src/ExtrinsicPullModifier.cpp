@@ -56,14 +56,14 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
 
             bool isBoundaryNode = false;
             int numNeighbours = neighbourNodes.size();
-            if( numNeighbours < 3 )
+            if (numNeighbours < 3)
             {
                 isBoundaryNode = true;
             }
             else
             {
                 // for (int idx=0; idx<numNeighbours; idx++)
-                for(auto tempNeighbour : neighbourNodes)
+                for (auto tempNeighbour : neighbourNodes)
                 {
                     // Node<2>* tempNeighbour = rCellPopulation.GetNode(neighbourNodes[idx]);
                     std::set<unsigned> tempNeighbourNodes = rCellPopulation.GetNeighbouringNodeIndices(tempNeighbour);
@@ -144,7 +144,7 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
                 {
                     int i = 0; // counter
                     bool done = false; // Breaks when we have placed the vertex
-                    while( not done )
+                    while (not done)
                     {
                         // If we have reached the end of the list, break
                         if (i == boundaryNodes.size())
@@ -173,7 +173,7 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
                         currentAngle = std::atan2(dY, dX);
                         // If the angle of new node is smaller, it comes first
                         // so append it at this location.
-                        if ( currentAngle < prevAngle && not done )
+                        if (currentAngle < prevAngle && not done)
                         {
                             boundaryNodes.insert(boundaryNodes.begin() + i, node_index);
                             done = true;
@@ -213,7 +213,7 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
             dist2 = xDiff*xDiff + yDiff*yDiff;
             tempDist = std::sqrt(dist2);
             // If smaller, mark this as the closest node.
-            if( tempDist < upperDist )
+            if (tempDist < upperDist)
             {
                 upperDist = tempDist;
                 upperNode = i;
@@ -225,7 +225,7 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
             dist2 = xDiff*xDiff + yDiff*yDiff;
             tempDist = std::sqrt(dist2);
             // If smaller, mark this as the closest node.
-            if( tempDist < lowerDist )
+            if (tempDist < lowerDist)
             {
                 lowerDist = tempDist;
                 lowerNode = i;
@@ -268,13 +268,12 @@ void ExtrinsicPullModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& r
                 // cout << p_node->rGetLocation()[0] << ", " << p_node->rGetLocation()[1] << ", ";
 
             }
-            else if( i > upperNode)
+            else if (i > upperNode)
             {
                 break;
             }
         }
         // std::cout << "\n" << '\n';
-
     }
 }
 

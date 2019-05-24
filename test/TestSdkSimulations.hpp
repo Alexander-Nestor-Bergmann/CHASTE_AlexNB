@@ -31,7 +31,7 @@ class TestSdkSimulations : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestAllInOnego() throw (Exception)
+    void TestAllInOnego()
     {
         // Specify simulation rules
         bool check_internal_intersections = false;

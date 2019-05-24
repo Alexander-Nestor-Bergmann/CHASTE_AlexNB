@@ -69,16 +69,13 @@ void ExtrinsicPullModifierToroidal::UpdateAtEndOfTimeStep(AbstractCellPopulation
     }
     else if (mApplyExtrinsicPull)
     {
-
         // double YshrinkSpeed = mSpeed/2;
 
         // Pointer to mesh
         AbstractMesh<2, 2>& r_mesh = rCellPopulation.rGetMesh();
         Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&r_mesh);
 
-
-
-        // STRETCH LHS BECAUSE THATS HOW STRESS RELAXATION RELAXES.
+        // STRETCH LHS BECAUSE THAT'S HOW STRESS RELAXATION RELAXES.
         // Coords of box
         double currentXLower = p_static_cast_mesh_toroidal->GetBoxCoords(0);
         double currentXUpper = p_static_cast_mesh_toroidal->GetBoxCoords(1);
@@ -120,7 +117,6 @@ void ExtrinsicPullModifierToroidal::UpdateAtEndOfTimeStep(AbstractCellPopulation
         // Reset the size of the box
         // p_static_cast_mesh_toroidal->SetBoxCoords(0, currentXLower - 0.5*mSpeed*dt);
         p_static_cast_mesh_toroidal->SetBoxCoords(1, currentXUpper + mSpeed*dt);
-
 
         // // // Coords of box
         // double currentXLower = p_static_cast_mesh_toroidal->GetBoxCoords(0);
@@ -184,7 +180,6 @@ void ExtrinsicPullModifierToroidal::UpdateAtEndOfTimeStep(AbstractCellPopulation
 //         // p_static_cast_mesh_toroidal->SetBoxCoords(3,                                                                     currentYUpper-YshrinkSpeed*dt);
 //         // p_static_cast_mesh_toroidal->RefitPeriodicBox();
     }
-
 }
 
 void ExtrinsicPullModifierToroidal::SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)

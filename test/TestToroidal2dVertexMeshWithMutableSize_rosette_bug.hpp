@@ -23,6 +23,7 @@
 #include "BoundaryBoxRelaxationModifier.hpp"
 #include "StressTensor.hpp"
 #include <Eigen/Dense>
+#include "Debug.hpp"
 
 static const double M_DT = 0.5; // 0.1
 static const double M_RELAXATION_TIME = 3;
@@ -37,14 +38,14 @@ static const unsigned M_NUM_CELLS_WIDE = 14; // 14
 static const unsigned M_NUM_CELLS_HIGH = 20; // 20
 static const double M_ROSETTE_PROBABILITY = 0.5;
 
-// NOTE Mesh is will only flip cells from top to bottom, not left to right. To
+// NOTE Mesh will only flip cells from top to bottom, not left to right. To
 // change this turn on the "SetNode" functions for the x-axis.
 
 class TestSdkSimulationsWithToroidalMeshRosetteBug : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestAllInOnego() throw (Exception)
+    void TestAllInOnego()
     {
         // Specify simulation rules
         bool check_internal_intersections = false;
@@ -61,7 +62,6 @@ public:
         // double gamma_bar = 0.145;
         double heterotypic_line_tension_multiplier = 2.0;
         double supercontractile_line_tension_multiplier = 8.0; // 8.0 for scenario 4, 2.0 for normal
-
 
         // Initialise various singletons
         SimulationTime::Destroy();
@@ -120,15 +120,16 @@ public:
         p_force->SetBoundaryLineTensionParameter(lambda_bar*pow(k,1.5));
         p_force->SetUseCombinedInterfacesForLineTension(false);
 
-
         simulation.AddForce(p_force); // Can also add this after initial solve.
 
         // Pass in a target area modifier (needed, but not used)
         MAKE_PTR(ConstantTargetAreaModifier<2>, p_growth_modifier);
         simulation.AddSimulationModifier(p_growth_modifier);
 
+        MARK;
         // Run simulation
         simulation.Solve();
+        MARK;
 
         // Before bestowing stripes, set the reference stress about which to relax as the starting stress.
         p_mesh->SetReferenceStress(cell_population, p_force.get(), false);
@@ -210,8 +211,10 @@ public:
 
         // Run the simulation
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);
-        simulation.Solve();
 
+        MARK;
+        simulation.Solve();
+        MARK;
     }
 };
 

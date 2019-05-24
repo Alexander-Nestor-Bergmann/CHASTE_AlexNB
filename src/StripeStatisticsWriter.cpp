@@ -56,7 +56,7 @@ void StripeStatisticsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopula
             unsigned neighbour_stripe_identity = p_neighbour->GetCellData()->GetItem("stripe");
 
             unsigned num_stripes = 4; ///\todo remove hardcoding
-            unsigned mismatch = abs(cell_stripe_identity - neighbour_stripe_identity);
+            unsigned mismatch = abs(int(cell_stripe_identity - neighbour_stripe_identity));
             if (mismatch > num_stripes/2)
             {
                 mismatch = num_stripes - mismatch;

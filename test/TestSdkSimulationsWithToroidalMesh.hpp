@@ -37,14 +37,14 @@ static const unsigned M_NUM_CELLS_WIDE = 28; // 14
 static const unsigned M_NUM_CELLS_HIGH = 40; // 20
 static const double M_ROSETTE_PROBABILITY = 0;
 
-// NOTE Mesh is will only flip cells from top to bottom, not left to right. To
+// NOTE Mesh will only flip cells from top to bottom, not left to right. To
 // change this turn on the "SetNode" functions for the x-axis.
 
 class TestSdkSimulationsWithToroidalMesh : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestAllInOnego() throw (Exception)
+    void TestAllInOnego()
     {
         // Specify simulation rules
         bool check_internal_intersections = false;
@@ -211,28 +211,36 @@ public:
         simulation.SetEndTime(M_RELAXATION_TIME + M_EXTENSION_TIME);
         simulation.Solve();
 
-
         // StressTensor
         c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population, p_force.get());
+
         // Convert to Eigen::Matrix type
         Eigen::Matrix2d eigenStressTensor(2,2);
+
         // Assign values
         // eigenStressTensor << 1, 2, 3, 4;
         eigenStressTensor(0,0) = stressTensor2d(0,0);
         eigenStressTensor(0,1) = stressTensor2d(0,1);
         eigenStressTensor(1,0) = stressTensor2d(1,0);
         eigenStressTensor(1,1) = stressTensor2d(1,1);
-        // Output the tensor.
+
+        // Output the tensor
         std::cout << eigenStressTensor << '\n';
+
         // Create the solver
         Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(eigenStressTensor);
-        // Check for success.
-        if (eigensolver.info() != Eigen::Success) abort();
+
+        // Check for success
+        if (eigensolver.info() != Eigen::Success)
+        {
+            abort();
+        }
+
         // Output results
         cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
         cout << "Here's a matrix whose columns are eigenvectors of A \n"
-            << "corresponding to these eigenvalues:\n"
-            << eigensolver.eigenvectors() << endl;
+             << "corresponding to these eigenvalues:\n"
+             << eigensolver.eigenvectors() << endl;
     }
 };
 

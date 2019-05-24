@@ -25,7 +25,6 @@
 #include "StressTensor.hpp"
 #include <Eigen/Dense>
 
-
 static const double M_DT = 0.1;
 static const double M_RELAXATION_TIME = 20;
 static const double M_VIS_TIME_STEP = 1;
@@ -37,9 +36,8 @@ class TestStressTensor : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestTissueStressTensor() throw (Exception)
+    void TestTissueStressTensor()
     {
-
         // Initialise various singletons
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -86,49 +84,47 @@ public:
         // p_modifier->SetSpeed(M_PULL);
         // simulation.AddSimulationModifier(p_modifier);
 
-        // solve
+        // Solve
         simulation.Solve();
 
         // StressTensor
         // StressTensor<2> stressTensorObject;
         // c_matrix<double, 2,2> stressTensor2d = stressTensorObject.GetTissueStressTensor(cell_population);
         c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(cell_population, p_force.get());
+
         // Convert to Eigen::Matrix type
         Eigen::Matrix2d eigenStressTensor(2,2);
+
         // Assign values
         // eigenStressTensor << 1, 2, 3, 4;
         eigenStressTensor(0,0) = stressTensor2d(0,0);
         eigenStressTensor(0,1) = stressTensor2d(0,1);
         eigenStressTensor(1,0) = stressTensor2d(1,0);
         eigenStressTensor(1,1) = stressTensor2d(1,1);
-        // Output the tensor.
+
+        // Output the tensor
         std::cout << eigenStressTensor << '\n';
+
         // Create the solver
         Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> eigensolver(eigenStressTensor);
-        // Check for success.
-        if (eigensolver.info() != Eigen::Success) abort();
+
+        // Check for success
+        if (eigensolver.info() != Eigen::Success)
+        {
+            abort();
+        }
+
         // Output results
         cout << "The eigenvalues of A are:\n" << eigensolver.eigenvalues() << endl;
         cout << "Here's a matrix whose columns are eigenvectors of A \n"
-            << "corresponding to these eigenvalues:\n"
-            << eigensolver.eigenvectors() << endl;
-
+             << "corresponding to these eigenvalues:\n"
+             << eigensolver.eigenvectors() << endl;
 
         cout << stressTensor2d(0,0) << ", " << stressTensor2d(0,1) << ", " << stressTensor2d(1,0) << ", " << stressTensor2d(1,1) << ", ";
         std::cerr << "/* error message */" << '\n';
 
-
         // simulation.Solve();
-
-
     }
 };
-
-
-
-
-
-
-
 
 #endif /* TestStressTensor_HPP_*/

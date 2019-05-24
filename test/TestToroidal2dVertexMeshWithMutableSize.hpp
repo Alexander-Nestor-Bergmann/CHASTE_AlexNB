@@ -32,15 +32,13 @@ class TestToroidal2dVertexMeshWithMutableSize : public AbstractCellBasedWithTimi
 {
 public:
 
-    void TestPullOnVertices() throw (Exception)
+    void TestPullOnVertices()
     {
-
         // Initialise various singletons
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
         CellPropertyRegistry::Instance()->Clear();
         CellId::ResetMaxCellId();
-
 
         // Create mesh
         ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH);
@@ -75,24 +73,14 @@ public:
         MAKE_PTR(ConstantTargetAreaModifier<2>, p_growth_modifier);
         simulation.AddSimulationModifier(p_growth_modifier);
 
-
         // Extrinsic pull on RHS nodes
         MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
         p_modifier->SetSpeed(M_PULL);
         simulation.AddSimulationModifier(p_modifier);
 
-
         simulation.Solve();
-
     }
 };
-
-
-
-
-
-
-
 
 #endif /* TESTTOROIDAL2DVERTEXMESHWITHMUTABLESIZE_HPP_*/

@@ -8,7 +8,6 @@ SidekickBoundaryConditionToroidal::SidekickBoundaryConditionToroidal(AbstractCel
 
 void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
 {
-
     // Pointer to mesh --
     AbstractMesh<2, 2>& r_mesh = this->mpCellPopulation->rGetMesh();
     Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&r_mesh);
@@ -41,23 +40,22 @@ void SidekickBoundaryConditionToroidal::ImposeBoundaryCondition(const std::map<N
         Node<2>* p_node = this->mpCellPopulation->GetNode(n_index);
         double nodeX = p_node->rGetLocation()[0];
         double nodeY = p_node->rGetLocation()[1];
-        // angle to node
-        double angleNode = std::atan2(nodeY-boxCentroidY,
-                                    nodeX-boxCentroidX);
-        // If on LHS
-         if( angleNode <= anglex0y0 || angleNode >= anglex0y1 )
-         {
-             // Set its location to the old location
-             c_vector<double, 2> old_node_location;
-             old_node_location = rOldLocations.find(p_node)->second;
 
-             p_node->rGetModifiableLocation()[0] = old_node_location[0];
-         }
+        // Angle to node
+        double angleNode = std::atan2(nodeY-boxCentroidY, nodeX-boxCentroidX);
+
+        // If on LHS
+        if (angleNode <= anglex0y0 || angleNode >= anglex0y1)
+        {
+            // Set its location to the old location
+            c_vector<double, 2> old_node_location;
+            old_node_location = rOldLocations.find(p_node)->second;
+
+            p_node->rGetModifiableLocation()[0] = old_node_location[0];
+        }
     }
     // p_static_cast_mesh_toroidal->SetBoxCoords(0, 0);
     // p_static_cast_mesh_toroidal->RefitPeriodicBox();
-
-
 }
 
 bool SidekickBoundaryConditionToroidal::VerifyBoundaryCondition()

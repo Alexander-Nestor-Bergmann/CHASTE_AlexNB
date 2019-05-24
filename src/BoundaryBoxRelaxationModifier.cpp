@@ -33,6 +33,7 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
 
         // Force in x (stress * box height)
         double xForce = - stressTensor2d(0,0) * p_mesh->GetWidth(1);
+
         // Force in y (stress * box width)
         double yForce = - stressTensor2d(1,1) * p_mesh->GetWidth(0);
 
@@ -58,7 +59,7 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
         std::set<unsigned> boundaryNodes = p_mesh->GetBoundaryNodes();
 
         // If it was a boundary node, check where it is and pull it appropriately
-        for(auto n_index : boundaryNodes)
+        for (auto n_index : boundaryNodes)
         {
             // Get the node
             Node<2>* p_node = p_mesh->GetNode(n_index);
@@ -75,7 +76,7 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
                 p_node->rGetModifiableLocation()[1] += deltaY;
             }
             // LHS
-            if ( angleNode <= anglex0y0 || angleNode >= anglex0y1 )
+            if (angleNode <= anglex0y0 || angleNode >= anglex0y1)
             {
                 p_node->rGetModifiableLocation()[0] += deltaX;
             }

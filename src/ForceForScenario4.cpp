@@ -271,7 +271,7 @@ double ForceForScenario4<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA,
             else
             {
                 // Label numbers wrap around, so check to find smallest difference in stripe identities
-                unsigned mismatch = abs(cell_1_stripe_identity - cell_2_stripe_identity);
+                unsigned mismatch = abs(int(cell_1_stripe_identity - cell_2_stripe_identity));
                 if (mismatch > mNumStripes/2)
                 {
                     mismatch = mNumStripes - mismatch;

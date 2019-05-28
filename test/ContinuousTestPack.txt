@@ -1,6 +1,6 @@
 TestHello.hpp
 TestSdkSimulations.hpp
+TestSimulationsForSdkPaper.hpp
 TestToroidal2dVertexMeshWithMutableSize.hpp
 TestSdkSimulationsWithToroidalMesh.hpp
 TestStressTensor.hpp
-TestToroidal2dVertexMeshWithMutableSize_rosette_bug.hpp

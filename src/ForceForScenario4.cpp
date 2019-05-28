@@ -15,83 +15,6 @@ ForceForScenario4<DIM>::ForceForScenario4()
 }
 
 template<unsigned DIM>
-void ForceForScenario4<DIM>::SetBoundaryBoxRelaxation(VertexBasedCellPopulation<2>& rCellPopulation)
-{
-    // // \TODO need to be able to determine the width&height of the periodic box after applying these forces. Can't do that at the moment (the height and widths must be given to determine the peiodicity).
-    // // Only works in 2D atm.
-    // assert(DIM==2);
-    //
-    // // Get the mesh
-    // AbstractMesh<2, 2>& p_mesh = rCellPopulation.rGetMesh();
-    // Toroidal2dVertexMeshWithMutableSize* p_static_cast_mesh_toroidal = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&p_mesh);
-    //
-    // // StressTensor
-    // c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(rCellPopulation);
-    // // Get the force to be applied to the boundary. \todo This currenly just assumes it is applied over the length of the box width. A proper method should account for it being applied over the junctions. Also, lets ignore shear.
-    // double yForce = stressTensor2d(1,1) * p_static_cast_mesh_toroidal->GetWidth(0);
-    //
-    // // Coords of box
-    // double currentXLower = p_static_cast_mesh_toroidal->GetBoxCoords(0);
-    // double currentXUpper = p_static_cast_mesh_toroidal->GetBoxCoords(1);
-    // double currentYLower = p_static_cast_mesh_toroidal->GetBoxCoords(2);
-    // double currentYUpper = p_static_cast_mesh_toroidal->GetBoxCoords(3);
-    // // Centroid of box
-    // double boxCentroidX = (currentXLower + currentXUpper)/2;
-    // double boxCentroidY = (currentYLower + currentYUpper)/2;
-    // // Angles to corners of box. Used to see which side boundary vertices
-    // // are on
-    // double anglex0y0 = std::atan2(currentYLower-boxCentroidY,
-    //                             currentXLower-boxCentroidX);
-    // double anglex0y1 = std::atan2(currentYUpper-boxCentroidY,
-    //                             currentXLower-boxCentroidX);
-    // double anglex1y1 = std::atan2(currentYUpper-boxCentroidY,
-    //                             currentXUpper-boxCentroidX);
-    // double anglex1y0 = std::atan2(currentYLower-boxCentroidY,
-    //                             currentXUpper-boxCentroidX);
-    //
-    // // Set to store boundary
-    // std::set<unsigned> boundaryNodes = p_static_cast_mesh_toroidal->GetBoundaryNodes();
-    //
-    // // If it was a boundary node, check where it is and pull it
-    // for(auto n_index : boundaryNodes)
-    // {
-    //     // Get the node
-    //     Node<2>* p_node = rCellPopulation.GetNode(n_index);
-    //     double nodeX = p_node->rGetLocation()[0];
-    //     double nodeY = p_node->rGetLocation()[1];
-    //     // angle to node
-    //     double angleNode = std::atan2(nodeY-boxCentroidY,
-    //                                 nodeX-boxCentroidX);
-    //
-    //     // Boolean to check if on upper or lower boundary
-    //     bool isUpperOrLower = false;
-    //     // Multiplier to set direction of force, depending if we are on upper or lower boundary.
-    //     double fMultiplier;
-    //     if (anglex0y0 <= angleNode && anglex1y0 >= angleNode)
-    //     {
-    //         isUpperOrLower = true;
-    //         fMultiplier = 1;
-    //     }
-    //     else if (anglex1y1 <= angleNode && anglex0y1 >= angleNode)
-    //     {
-    //         isUpperOrLower = true;
-    //         fMultiplier = -1;
-    //     }
-    //
-    //     // Now we know if vertex is on upper or lower boundary so calc force from stress tensor:
-    //     if(isUpperOrLower)
-    //     {
-    //         std::cout << "/* message */" << '\n';
-    //     }
-    //
-    // }
-    //
-    //
-
-}
-
-
-template<unsigned DIM>
 double ForceForScenario4<DIM>::GetCombinedInterfaceLength(Node<DIM>* pNode,
                                                       unsigned elemIndex,
                                                       unsigned cell1StripeIdentity,
@@ -107,9 +30,15 @@ double ForceForScenario4<DIM>::GetCombinedInterfaceLength(Node<DIM>* pNode,
 
     double combined_interface_length = 0.0;
     bool part_of_combined_interface = true;
-    while (part_of_combined_interface)
+
+    // We include this condition in the while loop to avoid an infinite loop in
+    // the case of a cell surrounded by cells of different stripe identities
+    unsigned num_prev_nodes_considered = 0;
+
+    while (part_of_combined_interface && (num_prev_nodes_considered < num_nodes))
     {
         unsigned this_node_index = p_prev_node->GetIndex();
+
         std::set<unsigned> this_node_elems = prev_node_elems;
         prev_local_idx = (prev_local_idx - 1 + num_nodes)%num_nodes;
 
@@ -144,6 +73,8 @@ double ForceForScenario4<DIM>::GetCombinedInterfaceLength(Node<DIM>* pNode,
                 combined_interface_length += rVertexCellPopulation.rGetMesh().GetDistanceBetweenNodes(p_prev_node->GetIndex(), this_node_index);
             }
         }
+
+        num_prev_nodes_considered++;
     }
 
     Node<DIM>* p_next_node = pNode;
@@ -151,7 +82,12 @@ double ForceForScenario4<DIM>::GetCombinedInterfaceLength(Node<DIM>* pNode,
     unsigned next_local_idx = p_elem->GetNodeLocalIndex(pNode->GetIndex());
 
     part_of_combined_interface = true;
-    while (part_of_combined_interface)
+
+    // We include this condition in the while loop to avoid an infinite loop in
+    // the case of a cell surrounded by cells of different stripe identities
+    unsigned num_next_nodes_considered = 0;
+
+    while (part_of_combined_interface && (num_next_nodes_considered < num_nodes))
     {
         unsigned this_node_index = p_next_node->GetIndex();
         std::set<unsigned> this_node_elems = next_node_elems;
@@ -189,6 +125,7 @@ double ForceForScenario4<DIM>::GetCombinedInterfaceLength(Node<DIM>* pNode,
                 combined_interface_length += rVertexCellPopulation.rGetMesh().GetDistanceBetweenNodes(this_node_index, p_next_node->GetIndex());
             }
         }
+        num_next_nodes_considered++;
     }
 
     return combined_interface_length;
@@ -259,6 +196,7 @@ double ForceForScenario4<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA,
             // Find the stripe identities on either side of the edge
             CellPtr p_cell_1 = rVertexCellPopulation.GetCellUsingLocationIndex(elem_1_index);
             CellPtr p_cell_2 = rVertexCellPopulation.GetCellUsingLocationIndex(elem_2_index);
+
             unsigned cell_1_stripe_identity = p_cell_1->GetCellData()->GetItem("stripe");
             unsigned cell_2_stripe_identity = p_cell_2->GetCellData()->GetItem("stripe");
 

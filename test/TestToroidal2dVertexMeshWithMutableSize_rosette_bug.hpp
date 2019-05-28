@@ -41,7 +41,7 @@ static const double M_ROSETTE_PROBABILITY = 0.5;
 // NOTE Mesh will only flip cells from top to bottom, not left to right. To
 // change this turn on the "SetNode" functions for the x-axis.
 
-class TestSdkSimulationsWithToroidalMeshRosetteBug : public AbstractCellBasedWithTimingsTestSuite
+class TestToroidal2dVertexMeshWithMutableSize_rosette_bug : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 

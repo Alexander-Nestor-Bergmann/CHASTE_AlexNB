@@ -196,6 +196,16 @@ public:
      std::set<unsigned> GetBoundaryNodes();
 
      /**
+      * New GetNumRosettes() method.
+      *
+      * Calculate how many rosettes (rank > 3) are in the tissue. NOTE excludes
+      * boundary nodes because they do funky things.
+      *
+      * @return The number of rosettes
+      */
+     double GetNumRosettes();
+
+     /**
       * New SetReferenceStress() method.
       *
       * Sets the stress tensor of the inital tissue. This stress is then used as

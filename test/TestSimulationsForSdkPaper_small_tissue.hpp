@@ -26,12 +26,11 @@
 #include <Eigen/Dense>
 
 static const double M_DT = 0.1; // 0.1
-static const double M_RELAXATION_TIME = 12;
+static const double M_RELAXATION_TIME = 18;
 static const double M_EXTENSION_TIME = 300;
 static const double M_VIS_TIME_STEP = 10;
 static const double M_PULL = 0.02; // 0.005 good 0.04 max
-static const double M_PULL_FORCE = 0.00006;
-static const double M_TISSUE_STIFFNESS = 75; // 1500 for a 14x20 tissue, 2000 for 28x40
+static const double M_TISSUE_STIFFNESS = 1500; // 500 for a 14x20 tissue, 2000 for 28x40
 static const unsigned M_NUM_CELLS_WIDE = 14; // 14
 static const unsigned M_NUM_CELLS_HIGH = 20; // 20
 
@@ -51,7 +50,7 @@ public:
     void xTestSimulation1()
     {
         // Specify simulation rules
-        bool use_combined_interfaces_for_line_tension = false;
+        bool use_combined_interfaces_for_line_tension = true;
         bool use_distinct_stripe_mismatches_for_combined_interfaces = false;
         std::string output_name("TestSimulation1");
 
@@ -62,8 +61,8 @@ public:
         double gamma_bar = 0.04;
         // double lambda_bar = -0.569;
         // double gamma_bar = 0.145;
-        double heterotypic_line_tension_multiplier = 1.0;
-        double supercontractile_line_tension_multiplier = 1.0; // 8.0 for scenario 4, 2.0 for normal
+        double heterotypic_line_tension_multiplier = 2.0;
+        double supercontractile_line_tension_multiplier = 8.0; // 8.0 for scenario 4, 2.0 for normal
 
         // Initialise various singletons
         SimulationTime::Destroy();
@@ -169,7 +168,6 @@ public:
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
         p_modifier->ApplyExtrinsicPull(true);
         p_modifier->SetSpeed(M_PULL);
-        p_modifier->SetPullingForce(M_PULL_FORCE);
         simulation.AddSimulationModifier(p_modifier);
 
         // Relaxing the boundary
@@ -359,14 +357,14 @@ public:
         CellId::ResetMaxCellId();
 
         // Create mesh
-        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.66584922); // 0.66584922, 0.881149
+        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.66584922);
         Toroidal2dVertexMeshWithMutableSize* p_mesh = generator.GetMutableToroidalMesh();
         p_mesh->SetCheckForInternalIntersections(false);
 
         // Enforce rosettes with some probability
         p_mesh->SetProtorosetteFormationProbability(1);
-        p_mesh->SetProtorosetteResolutionProbabilityPerTimestep(.1 * (30. / (M_DT * M_EXTENSION_TIME))); // 0 for sdk. Maybe .1 for WT.
-        p_mesh->SetRosetteResolutionProbabilityPerTimestep(0.01 * (30. / (M_DT * M_EXTENSION_TIME)));
+        p_mesh->SetProtorosetteResolutionProbabilityPerTimestep(.02); // 0 for sdk. Maybe .1 for WT.
+        p_mesh->SetRosetteResolutionProbabilityPerTimestep(0.002);
 
         // Create some non-proliferating cells
         std::vector<CellPtr> cells;
@@ -458,16 +456,12 @@ public:
 
         p_force->SetUseCombinedInterfacesForLineTension(use_combined_interfaces_for_line_tension);
         p_force->SetUseDistinctStripeMismatchesForCombinedInterfaces(use_distinct_stripe_mismatches_for_combined_interfaces);
-        p_force->SetGradualIncreaseContractilityTime(M_EXTENSION_TIME/M_EXTENSION_TIME);
 
         // Extrinsic pull
         MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
-        p_modifier->ApplyExtrinsicPull(false);
+        p_modifier->ApplyExtrinsicPull(true);
         p_modifier->SetSpeed(M_PULL);
-        p_modifier->SetPullingForce(M_PULL_FORCE);
-        p_modifier->SetGradualIncreasePullTime(M_EXTENSION_TIME/4);
-        p_modifier->SetSimulationEndTime(M_EXTENSION_TIME);
         simulation.AddSimulationModifier(p_modifier);
 
         // Relaxing the boundary
@@ -501,7 +495,7 @@ public:
         // -0.259,0.172
         double k = 1.0;
         double lambda_bar = 0.05; // Area = 0.69496417 for L,G = 0.05, 0.04
-        double gamma_bar = 0.01;
+        double gamma_bar = 0.04;
         // double lambda_bar = -0.569;
         // double gamma_bar = 0.145;
         double heterotypic_line_tension_multiplier = 2.0;
@@ -514,7 +508,7 @@ public:
         CellId::ResetMaxCellId();
 
         // Create mesh
-        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.881149); // 0.66584922, 0.881149
+        ToroidalHoneycombVertexMeshGeneratorMutable generator(M_NUM_CELLS_WIDE, M_NUM_CELLS_HIGH, 0.01, 0.001, 0.66584922);
         Toroidal2dVertexMeshWithMutableSize* p_mesh = generator.GetMutableToroidalMesh();
         p_mesh->SetCheckForInternalIntersections(false);
 

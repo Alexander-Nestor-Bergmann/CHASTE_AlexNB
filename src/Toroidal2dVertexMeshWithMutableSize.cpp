@@ -74,7 +74,7 @@ void Toroidal2dVertexMeshWithMutableSize::SetNode(unsigned nodeIndex, ChastePoin
     if (x_coord > mBoxUpperX)
     {
         // Move point left
-        // point.SetCoordinate(0, x_coord - mWidth);
+        point.SetCoordinate(0, x_coord - mWidth);
     }
     else if (x_coord < mBoxLowerX)
     {
@@ -82,7 +82,7 @@ void Toroidal2dVertexMeshWithMutableSize::SetNode(unsigned nodeIndex, ChastePoin
         // point.SetCoordinate(0, x_coord + mWidth);
 
         // Fix the left-hand side at within box.
-        // point.SetCoordinate(0, mBoxLowerX);
+        point.SetCoordinate(0, mBoxLowerX);
     }
     if (y_coord > mBoxUpperY)
     {
@@ -187,39 +187,9 @@ double Toroidal2dVertexMeshWithMutableSize::GetBoxCoords(const unsigned& rDimens
 
 void Toroidal2dVertexMeshWithMutableSize::RefitPeriodicBox()
 {
-    // // \TODO can't auto find the boxwidth because this toroidal framework uses that as an input to get the position of the boundary.
-    // // Bottom left corner:
-    // c_vector<double, 2> boxCoord;
-    // boxCoord(0) = mBoxUpperX;
-    // boxCoord(1) = mBoxUpperY;
-    // // Find the node closest to bottom left corner
-    // unsigned top_node_index = GetNearestNodeIndexIgnorePeriodicity(boxCoord);
-    // c_vector<double, 2> top_node_location;
-    // top_node_location = GetNode(top_node_index)->rGetLocation();
-    // // Upper Corner
-    // boxCoord(0) = top_node_location[0];
-    // boxCoord(1) = top_node_location[1] - mHeight;
-    // // Find the node closest to bottom left corner
-    // unsigned bottom_node_index = GetNearestNodeIndexIgnorePeriodicity(boxCoord);
-    //
-    // // Top right corner
-    // boxCoord(0) = top_node_location[0] - mWidth;
-    // boxCoord(1) = top_node_location[1];
-    // // Find the node closest to bottom left corner
-    // unsigned left_node_index = GetNearestNodeIndexIgnorePeriodicity(boxCoord);
-    //
-    // std::cout << left_node_index << ", " <<  top_node_index << ", " << bottom_node_index << '\n';
-    // std::cout << top_node_location[0] << ", " << top_node_location[1] << '\n';
-    // std::cout << GetNode(bottom_node_index)->rGetLocation()[0] << ", " << GetNode(bottom_node_index)->rGetLocation()[1] << '\n';
-    // std::cout << GetNode(left_node_index)->rGetLocation()[0] << ", " << GetNode(left_node_index)->rGetLocation()[1] << '\n';
-    // std::cout << "/* message */" << '\n';
-    // abort();
-    //
-    // // Set the new box size.
-    // SetBoxCoords(0, GetNode(bottom_node_index)->rGetLocation()[0]);
-    // SetBoxCoords(1, top_node_location[0]);
-    // SetBoxCoords(2, GetNode(left_node_index)->rGetLocation()[1]);
-    // SetBoxCoords(3, top_node_location[1]);
+
+    //\todo this hasn't been tested.
+
 
     // Initialise minimum values as
     double minX = 100000;
@@ -276,6 +246,43 @@ void Toroidal2dVertexMeshWithMutableSize::SetBoxCoords(const unsigned& rDimensio
 
 }
 
+double Toroidal2dVertexMeshWithMutableSize::GetNumRosettes()
+{
+    // Get the boundary nodes.
+    std::set<unsigned> boundaryNodes = this->GetBoundaryNodes();
+
+    // Store number of rosettes
+    int num_rosettes = 0;
+    // std::set<unsigned> rosetteNodes;
+    int rank;
+
+    // Iterate over all nodes and count the number of elements they contain
+    unsigned num_nodes = this->GetNumNodes();
+    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    {
+        // Check if its a boundary node
+        // const bool is_in = boundaryNodes.find(node_index) != node_index;
+        if (boundaryNodes.count(node_index) == 0)
+        {
+            // Get the node
+            Node<2>* p_node = this->GetNode(node_index);
+            // And its rank
+            rank = p_node->rGetContainingElementIndices().size();
+
+            if (rank > 3)
+            {
+                num_rosettes += 1;
+                // rosetteNodes.insert(node_index);
+            }
+        }
+
+    }
+
+    return num_rosettes;
+    // return rosetteNodes.size();
+
+}
+
 
 std::set<unsigned> Toroidal2dVertexMeshWithMutableSize::GetBoundaryNodes()
 {
@@ -304,7 +311,7 @@ std::set<unsigned> Toroidal2dVertexMeshWithMutableSize::GetBoundaryNodes()
              double width = this->GetWidth(0);
              double height = this->GetWidth(1);
              // If on other side of mesh, mark as boundary node.
-             if( fabs(nodeX - neighbourX) > 0.5*width || fabs(nodeY - neighbourY) > 0.5*height)
+             if( fabs(nodeX - neighbourX) > 0.2*width || fabs(nodeY - neighbourY) > 0.2*height)
              {
                  boundaryNodes.insert(node_index);
                  for(auto nabIndex : neighbourNodes)

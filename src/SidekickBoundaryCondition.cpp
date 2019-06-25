@@ -44,6 +44,7 @@ void SidekickBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node
            //     p_node->rGetModifiableLocation()[1] = old_node_location[1];
            // }
         }
+
     }}
 
 template<unsigned DIM>

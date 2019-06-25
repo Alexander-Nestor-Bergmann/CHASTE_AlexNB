@@ -10,6 +10,27 @@ class ExtrinsicPullModifierToroidal : public AbstractCellBasedSimulationModifier
 {
 private:
 
+    bool mApplyExtrinsicPullToAllNodes;
+    bool mPinAnteriorMostCells;
+    double mSpeed;
+    bool mApplyExtrinsicPull;
+
+    double mCellBoundaryAdhesionParameter;
+    double mHomotypicLineTensionParameter;
+    double mHeterotypicLineTensionParameter;
+    double mSupercontractileLineTensionParameter;
+
+    unsigned mNumStripes;
+
+    bool mUseCombinedInterfacesForLineTension;
+    bool mUseDistinctStripeMismatchesForCombinedInterfaces;
+    double mAreaElasticityParameter;
+    double mPerimeterContractilityParameter;
+    double mBoundaryLineTensionParameter;
+    double mPullingForce;
+    double mGradualPullIncreaseTime;
+    double mSimulationEndtime;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -27,12 +48,34 @@ private:
         archive & mPinAnteriorMostCells;
         archive & mSpeed;
         archive & mApplyExtrinsicPull;
+
+        archive & mHomotypicLineTensionParameter;
+        archive & mHeterotypicLineTensionParameter;
+        archive & mSupercontractileLineTensionParameter;
+        archive & mNumStripes;
+        archive & mUseCombinedInterfacesForLineTension;
+        archive & mUseDistinctStripeMismatchesForCombinedInterfaces;
+        archive & mAreaElasticityParameter;
+        archive & mPerimeterContractilityParameter;
+        archive & mBoundaryLineTensionParameter;
+        archive & mPullingForce;
+        archive & mGradualPullIncreaseTime;
+        archive & mSimulationEndtime;
     }
 
-    bool mApplyExtrinsicPullToAllNodes;
-    bool mPinAnteriorMostCells;
-    double mSpeed;
-    bool mApplyExtrinsicPull;
+    double GetCombinedInterfaceLength(Node<2>* pNode,
+                                      unsigned elemIndex,
+                                      unsigned cell1StripeIdentity,
+                                      unsigned cell2StripeIdentity,
+                                      VertexBasedCellPopulation<2>& rVertexCellPopulation);
+
+    double GetCombinedInterfaceScaleFactor(Node<2>* pNodeA,
+                                           Node<2>* pNodeB,
+                                           unsigned element1Index,
+                                           unsigned element2Index,
+                                           unsigned cell1StripeIdentity,
+                                           unsigned cell2StripeIdentity,
+                                           VertexBasedCellPopulation<2>& rVertexCellPopulation);
 
 public:
 
@@ -79,6 +122,42 @@ public:
      * @param applyExtrinsicPull whether to apply the extrinsic pull at all.
      */
     void ApplyExtrinsicPull(bool applyExtrinsicPullToAllNodes);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void SetGradualIncreasePullTime(double gradualPullIncreaseTime);
+    void SetSimulationEndTime(double simulationEndtime);
+
+    void SetAreaElasticityParameter(double areaElasticityParameter);
+    double GetAreaElasticityParameter();
+    void SetPerimeterContractilityParameter(double perimeterContractilityParameter);
+    double GetPerimeterContractilityParameter();
+    void SetBoundaryLineTensionParameter(double boundaryLineTensionParameter);
+    double GetBoundaryLineTensionParameter();
+    void SetPullingForce(double pullingForce);
+
+    c_matrix<double, 2, 2> GetTissueStressTensor(AbstractCellPopulation<2,2>& rCellPopulation);
+    c_matrix<double, 2,2> GetSingleCellStressTensor(AbstractCellPopulation<2,2>& rCellPopulation, unsigned elementIndex);
+
+    c_vector<double, 2> GetForceContribution(AbstractCellPopulation<2>& rCellPopulation);
+
+    double GetLineTensionParameter(Node<2>* pNodeA, Node<2>* pNodeB, VertexBasedCellPopulation<2>& rVertexCellPopulation);
+
+    void SetHomotypicLineTensionParameter(double homotypicLineTensionParameter);
+
+    void SetHeterotypicLineTensionParameter(double heterotypicLineTensionParameter);
+
+    void SetSupercontractileLineTensionParameter(double supercontractileLineTensionParameter);
+
+    void SetNumStripes(unsigned numStripes);
+
+    void SetUseCombinedInterfacesForLineTension(bool useCombinedInterfaceLineTension);
+
+    void SetUseDistinctStripeMismatchesForCombinedInterfaces(bool useDistinctStripeMismatchesForCombinedInterfaces);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void OutputForceParameters(out_stream& rParamsFile);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.

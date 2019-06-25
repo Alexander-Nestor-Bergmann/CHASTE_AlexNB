@@ -2,6 +2,8 @@
 #include "Toroidal2dVertexMeshWithMutableSize.hpp"
 #include "StressTensor.hpp"
 
+// \todo Had to turn off LHS relaxation because sdk bounday condition can't account for it.
+
 BoundaryBoxRelaxationModifier::BoundaryBoxRelaxationModifier()
     : AbstractCellBasedSimulationModifier<2>(),
       mStiffness(1000),
@@ -18,6 +20,7 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
 {
     if (mRelaxPeriodicBox)
     {
+        double dt = SimulationTime::Instance()->GetTimeStep();
         // Pointer to mesh
         AbstractMesh<2, 2>& r_mesh = rCellPopulation.rGetMesh();
         Toroidal2dVertexMeshWithMutableSize* p_mesh = static_cast<Toroidal2dVertexMeshWithMutableSize*>(&r_mesh);
@@ -31,11 +34,17 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
         // StressTensor
         c_matrix<double, 2,2> stressTensor2d = GetTissueStressTensor(rCellPopulation, mpForce.get());
 
+        // // Force in x (stress * box height)
+        // double xForce = - stressTensor2d(0,0) * (currentYUpper - currentYLower);
+        //
+        // // Force in y (stress * box width)
+        // double yForce = - stressTensor2d(1,1) * (currentXUpper - currentXLower);
+
         // Force in x (stress * box height)
-        double xForce = - stressTensor2d(0,0) * p_mesh->GetWidth(1);
+        double xForce = - stressTensor2d(0,0);
 
         // Force in y (stress * box width)
-        double yForce = - stressTensor2d(1,1) * p_mesh->GetWidth(0);
+        double yForce = - stressTensor2d(1,1);
 
         // Displacement of box is force/stiffness
         double deltaX = xForce / mStiffness;
@@ -73,20 +82,26 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
             // Bottom
             if (anglex0y0 <= angleNode && anglex1y0 >= angleNode)
             {
-                p_node->rGetModifiableLocation()[1] += deltaY;
+                p_node->rGetModifiableLocation()[1] = p_node->rGetLocation()[1] * (1+dt*deltaY);
             }
             // LHS
-            if (angleNode <= anglex0y0 || angleNode >= anglex0y1)
-            {
-                p_node->rGetModifiableLocation()[0] += deltaX;
-            }
+            // if (angleNode <= anglex0y0 || angleNode >= anglex0y1)
+            // {
+            //     p_node->rGetModifiableLocation()[0] += deltaX;
+            // }
         }
         // Reset the size of the box
-        p_mesh->SetBoxCoords(0, currentXLower + deltaX);
-        p_mesh->SetBoxCoords(1, currentXUpper - deltaX);
-        p_mesh->SetBoxCoords(2, currentYLower + deltaY);
-        p_mesh->SetBoxCoords(3, currentYUpper - deltaY);
+        // p_mesh->SetBoxCoords(0, currentXLower + deltaX);
+        p_mesh->SetBoxCoords(1, currentXUpper*(1 - dt*deltaX));
+        p_mesh->SetBoxCoords(2, currentYLower*( 1+ dt*deltaY));
+        p_mesh->SetBoxCoords(3, currentYUpper*(1 - dt*deltaY));
+
+        // Coords of box
+        double x = p_mesh->GetBoxCoords(1) - p_mesh->GetBoxCoords(0);
+        double y = p_mesh->GetBoxCoords(3) - p_mesh->GetBoxCoords(2);
+        std::cout << x << ", " << y << ", ";
     }
+
 }
 
 void BoundaryBoxRelaxationModifier::SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)

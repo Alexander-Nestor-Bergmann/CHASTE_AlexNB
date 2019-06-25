@@ -26,12 +26,12 @@
 #include <Eigen/Dense>
 
 static const double M_DT = 0.1; // 0.1
-static const double M_RELAXATION_TIME = 12;
+static const double M_RELAXATION_TIME = 1;
 static const double M_EXTENSION_TIME = 300;
 static const double M_VIS_TIME_STEP = 10;
 static const double M_PULL = 0.02; // 0.005 good 0.04 max
 static const double M_PULL_FORCE = 0.00006;
-static const double M_TISSUE_STIFFNESS = 75; // 1500 for a 14x20 tissue, 2000 for 28x40
+static const double M_TISSUE_STIFFNESS = 100; // 1500 for a 14x20 tissue, 2000 for 28x40
 static const unsigned M_NUM_CELLS_WIDE = 14; // 14
 static const unsigned M_NUM_CELLS_HIGH = 20; // 20
 
@@ -463,7 +463,7 @@ public:
         // Extrinsic pull
         MAKE_PTR(ExtrinsicPullModifierToroidal, p_modifier);
         p_modifier->ApplyExtrinsicPullToAllNodes(false);
-        p_modifier->ApplyExtrinsicPull(false);
+        p_modifier->ApplyExtrinsicPull(true);
         p_modifier->SetSpeed(M_PULL);
         p_modifier->SetPullingForce(M_PULL_FORCE);
         p_modifier->SetGradualIncreasePullTime(M_EXTENSION_TIME/4);

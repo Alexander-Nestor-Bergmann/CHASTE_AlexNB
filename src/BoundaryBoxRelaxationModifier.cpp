@@ -67,6 +67,10 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
         // Find the boundary nodes
         std::set<unsigned> boundaryNodes = p_mesh->GetBoundaryNodes();
 
+        double current_height = currentYUpper - currentYLower;
+        double new_height = current_height*(1-dt*deltaY);
+        double height_diff = -new_height + current_height;
+
         // If it was a boundary node, check where it is and pull it appropriately
         for (auto n_index : boundaryNodes)
         {
@@ -82,7 +86,8 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
             // Bottom
             if (anglex0y0 <= angleNode && anglex1y0 >= angleNode)
             {
-                p_node->rGetModifiableLocation()[1] = p_node->rGetLocation()[1] * (1+dt*deltaY);
+                // p_node->rGetModifiableLocation()[1] = p_node->rGetLocation()[1]*(1+dt*deltaY);
+                p_node->rGetModifiableLocation()[1] += 0.5*height_diff;
             }
             // LHS
             // if (angleNode <= anglex0y0 || angleNode >= anglex0y1)
@@ -93,8 +98,10 @@ void BoundaryBoxRelaxationModifier::UpdateAtEndOfTimeStep(AbstractCellPopulation
         // Reset the size of the box
         // p_mesh->SetBoxCoords(0, currentXLower + deltaX);
         p_mesh->SetBoxCoords(1, currentXUpper*(1 - dt*deltaX));
-        p_mesh->SetBoxCoords(2, currentYLower*( 1+ dt*deltaY));
-        p_mesh->SetBoxCoords(3, currentYUpper*(1 - dt*deltaY));
+        p_mesh->SetBoxCoords(2, currentYLower + 0.5*height_diff);
+        p_mesh->SetBoxCoords(3, currentYUpper - 0.5*height_diff);
+        // p_mesh->SetBoxCoords(2, currentYLower*(1+ dt*deltaY));
+        // p_mesh->SetBoxCoords(3, currentYUpper*(1 - dt*deltaY));
 
         // Coords of box
         double x = p_mesh->GetBoxCoords(1) - p_mesh->GetBoxCoords(0);
